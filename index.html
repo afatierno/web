@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Búsqueda</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <h1>Búsqueda</h1>
+  <p class="access-notice">Enlace personal e intransferible. Es responsabilidad del titular no compartirlo.</p>
+
+  <div class="panel">
+    <label for="query">Término de búsqueda</label>
+    <form id="search-form" class="search-row">
+      <input
+        id="query"
+        type="search"
+        placeholder="Escribe para buscar…"
+        autocomplete="off"
+        enterkeyhint="search"
+      >
+      <button id="btn-clear" type="button" class="btn-secondary">Limpiar</button>
+    </form>
+  </div>
+
+  <p id="status">Escribe al menos 4 caracteres para buscar</p>
+
+  <div id="results-wrap" class="hidden">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr id="table-head"></tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="js/app.js" type="module"></script>
+</body>
+</html>
