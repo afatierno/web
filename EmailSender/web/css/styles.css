@@ -96,6 +96,15 @@ header p {
   border-color: var(--accent);
 }
 
+.toolbar button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.toolbar button:disabled:hover {
+  border-color: var(--border);
+}
+
 .toolbar button.active {
   background: #dbeafe;
   border-color: var(--accent);
@@ -233,6 +242,11 @@ header p {
 
 #visualEditor img {
   cursor: pointer;
+}
+
+#visualEditor p.image-caret-slot {
+  min-height: 1.2em;
+  margin: 0;
 }
 
 #imageResizeOverlay {
