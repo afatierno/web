@@ -16,6 +16,11 @@
     <div class="editor-shell">
       <div class="toolbar" aria-label="Herramientas de formato">
         <div class="toolbar-group">
+          <button type="button" id="undoButton" title="Deshacer (Ctrl+Z)" aria-label="Deshacer">↶</button>
+          <button type="button" id="redoButton" title="Rehacer (Ctrl+Mayús+Z)" aria-label="Rehacer">↷</button>
+        </div>
+
+        <div class="toolbar-group">
           <button type="button" data-command="bold" title="Negrita"><strong>B</strong></button>
           <button type="button" data-command="italic" title="Cursiva"><em>I</em></button>
           <button type="button" data-command="underline" title="Subrayado"><u>U</u></button>
@@ -193,6 +198,6 @@
     </div>
   </div>
 
-  <script src="js/editor.js?v=6"></script>
+  <script src="js/editor.js?v=10"></script>
 </body>
 </html>

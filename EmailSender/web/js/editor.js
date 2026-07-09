@@ -4,6 +4,8 @@ const statusBar = document.getElementById("statusBar");
 const charCounter = document.getElementById("charCounter");
 const copyHtmlButton = document.getElementById("copyHtmlButton");
 const applyHtmlButton = document.getElementById("applyHtmlButton");
+const undoButton = document.getElementById("undoButton");
+const redoButton = document.getElementById("redoButton");
 const embeddedImageInput = document.getElementById("embeddedImageInput");
 const linkedImageButton = document.getElementById("linkedImageButton");
 const imageToolsLabel = document.getElementById("imageToolsLabel");
@@ -33,8 +35,11 @@ const cancelLinkedImageButton = document.getElementById("cancelLinkedImage");
 const closeLinkedImageDialogButton = document.getElementById("closeLinkedImageDialog");
 
 const SYNC_DELAY_MS = 450;
+const HISTORY_DEBOUNCE_MS = 400;
+const UNDO_HISTORY_LIMIT = 50;
 const IMAGE_MAX_DIMENSION = 200;
 const IMAGE_JPEG_QUALITY = 0.78;
+const IMAGE_CARET_SLOT_CLASS = "image-caret-slot";
 const SHEET_CELL_CHAR_LIMIT = 50000;
 
 let pendingImageInsert = null;
@@ -46,9 +51,16 @@ let selectedImage = null;
 let imageIdCounter = 0;
 let syncTimer = null;
 let isResizingImage = false;
+let historyPaused = false;
+let historyTimer = null;
+let undoStates = [];
+let undoIndex = 0;
 
 /** @type {Map<string, string>} */
 const imageStore = new Map();
+
+/** @type {Map<string, string>} */
+const imageSourceStore = new Map();
 
 /** @type {Map<string, string>} */
 const blobUrlStore = new Map();
@@ -87,6 +99,217 @@ function exec(command, value) {
   focusEditor();
   document.execCommand(command, false, value || null);
   scheduleSyncHtml();
+  recordHistorySnapshotNow();
+}
+
+function captureEditorState() {
+  ensureAllImageRecords();
+
+  const imageStoreCopy = {};
+  const imageSourceStoreCopy = {};
+
+  imageStore.forEach(function (value, key) {
+    imageStoreCopy[key] = value;
+  });
+
+  imageSourceStore.forEach(function (value, key) {
+    imageSourceStoreCopy[key] = value;
+  });
+
+  return {
+    html: visualEditor.innerHTML,
+    imageStore: imageStoreCopy,
+    imageSourceStore: imageSourceStoreCopy,
+  };
+}
+
+function editorStatesEqual_(left, right) {
+  if (!left || !right) {
+    return false;
+  }
+
+  if (left.html !== right.html) {
+    return false;
+  }
+
+  if (JSON.stringify(left.imageStore) !== JSON.stringify(right.imageStore)) {
+    return false;
+  }
+
+  return (
+    JSON.stringify(left.imageSourceStore || {}) ===
+    JSON.stringify(right.imageSourceStore || {})
+  );
+}
+
+function restoreEditorState(state) {
+  historyPaused = true;
+
+  blobUrlStore.forEach(function (_url, id) {
+    revokeBlobUrl(id);
+  });
+
+  imageStore.clear();
+  imageSourceStore.clear();
+  blobUrlStore.clear();
+
+  Object.keys(state.imageStore || {}).forEach(function (key) {
+    imageStore.set(key, state.imageStore[key]);
+  });
+
+  Object.keys(state.imageSourceStore || {}).forEach(function (key) {
+    imageSourceStore.set(key, state.imageSourceStore[key]);
+  });
+
+  imageStore.forEach(function (value, key) {
+    if (!imageSourceStore.has(key)) {
+      imageSourceStore.set(key, value);
+    }
+  });
+
+  visualEditor.innerHTML = state.html;
+
+  visualEditor.querySelectorAll("img").forEach(function (img) {
+    const id = img.dataset.imageId;
+
+    if (id && imageStore.has(id)) {
+      const blobUrl = dataUrlToBlobUrl(imageStore.get(id));
+      blobUrlStore.set(id, blobUrl);
+      img.src = blobUrl;
+    }
+  });
+
+  prepareAllImages();
+  deselectImage();
+  historyPaused = false;
+  scheduleSyncHtml({ immediate: true, silent: true });
+  updateUndoRedoButtons();
+}
+
+function updateUndoRedoButtons() {
+  if (undoButton) {
+    undoButton.disabled = undoIndex <= 0;
+  }
+
+  if (redoButton) {
+    redoButton.disabled = undoIndex >= undoStates.length - 1;
+  }
+}
+
+function initEditorHistory() {
+  undoStates = [captureEditorState()];
+  undoIndex = 0;
+  updateUndoRedoButtons();
+}
+
+function resetEditorHistory() {
+  initEditorHistory();
+}
+
+function recordHistorySnapshot() {
+  if (historyPaused || syncingFromHtml) {
+    return;
+  }
+
+  const state = captureEditorState();
+  const current = undoStates[undoIndex];
+
+  if (editorStatesEqual_(current, state)) {
+    return;
+  }
+
+  undoStates = undoStates.slice(0, undoIndex + 1);
+  undoStates.push(state);
+  undoIndex = undoStates.length - 1;
+
+  if (undoStates.length > UNDO_HISTORY_LIMIT) {
+    undoStates.shift();
+    undoIndex -= 1;
+  }
+
+  updateUndoRedoButtons();
+}
+
+function scheduleHistorySnapshot() {
+  if (historyPaused || syncingFromHtml) {
+    return;
+  }
+
+  clearTimeout(historyTimer);
+  historyTimer = setTimeout(recordHistorySnapshot, HISTORY_DEBOUNCE_MS);
+}
+
+function recordHistorySnapshotNow() {
+  clearTimeout(historyTimer);
+  recordHistorySnapshot();
+}
+
+function undoEditorChange() {
+  if (undoIndex <= 0) {
+    return;
+  }
+
+  undoIndex -= 1;
+  restoreEditorState(undoStates[undoIndex]);
+  setStatus("Cambio deshecho.");
+}
+
+function redoEditorChange() {
+  if (undoIndex >= undoStates.length - 1) {
+    return;
+  }
+
+  undoIndex += 1;
+  restoreEditorState(undoStates[undoIndex]);
+  setStatus("Cambio rehecho.");
+}
+
+function bindUndoRedo() {
+  if (undoButton) {
+    undoButton.addEventListener("click", function (event) {
+      event.preventDefault();
+      undoEditorChange();
+    });
+  }
+
+  if (redoButton) {
+    redoButton.addEventListener("click", function (event) {
+      event.preventDefault();
+      redoEditorChange();
+    });
+  }
+
+  document.addEventListener("keydown", function (event) {
+    if (!event.ctrlKey && !event.metaKey) {
+      return;
+    }
+
+    const active = document.activeElement;
+    const editingVisual = active === visualEditor || visualEditor.contains(active);
+
+    if (!editingVisual) {
+      return;
+    }
+
+    const key = event.key.toLowerCase();
+
+    if (key === "z" && event.shiftKey) {
+      event.preventDefault();
+      redoEditorChange();
+      return;
+    }
+
+    if (key === "z") {
+      event.preventDefault();
+      undoEditorChange();
+      return;
+    }
+
+    if (key === "y") {
+      event.preventDefault();
+      redoEditorChange();
+    }
+  });
 }
 
 function wrapSelectionWithStyle(styleText) {
@@ -114,6 +337,7 @@ function wrapSelectionWithStyle(styleText) {
   newRange.collapse(false);
   selection.addRange(newRange);
   scheduleSyncHtml();
+  recordHistorySnapshotNow();
 }
 
 function normalizeEditorHtml(html) {
@@ -125,6 +349,335 @@ function normalizeEditorHtml(html) {
     .replace(/\s*data-image-id="[^"]*"/g, "")
     .replace(/\s*data-image-mode="[^"]*"/g, "")
     .trim();
+}
+
+const PASTE_ALLOWED_TAGS = {
+  P: true,
+  BR: true,
+  DIV: true,
+  SPAN: true,
+  B: true,
+  STRONG: true,
+  I: true,
+  EM: true,
+  U: true,
+  S: true,
+  STRIKE: true,
+  A: true,
+  UL: true,
+  OL: true,
+  LI: true,
+  H1: true,
+  H2: true,
+  H3: true,
+  H4: true,
+  H5: true,
+  H6: true,
+  BLOCKQUOTE: true,
+  HR: true,
+  FONT: true,
+};
+
+const PASTE_ALLOWED_STYLES = {
+  color: true,
+  "background-color": true,
+  "font-size": true,
+  "font-family": true,
+  "font-weight": true,
+  "font-style": true,
+  "text-decoration": true,
+  "text-align": true,
+  "line-height": true,
+};
+
+const PASTE_BLOCK_TAGS = {
+  P: true,
+  DIV: true,
+  LI: true,
+  H1: true,
+  H2: true,
+  H3: true,
+  H4: true,
+  H5: true,
+  H6: true,
+  BLOCKQUOTE: true,
+};
+
+function escapeHtmlText_(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function parsePasteStyles_(styleText) {
+  const styles = {};
+
+  String(styleText || "")
+    .split(";")
+    .forEach(function (part) {
+      const colonIndex = part.indexOf(":");
+
+      if (colonIndex === -1) {
+        return;
+      }
+
+      const key = part.slice(0, colonIndex).trim().toLowerCase();
+      const value = part.slice(colonIndex + 1).trim();
+
+      if (!value || key.indexOf("mso-") === 0 || key.indexOf("-webkit-") === 0) {
+        return;
+      }
+
+      if (PASTE_ALLOWED_STYLES[key]) {
+        styles[key] = value;
+      }
+    });
+
+  return styles;
+}
+
+function stylesToAttribute_(styles) {
+  return Object.keys(styles)
+    .map(function (key) {
+      return key + ":" + styles[key];
+    })
+    .join(";");
+}
+
+function mergePasteStyles_(target, source) {
+  Object.keys(source).forEach(function (key) {
+    target[key] = source[key];
+  });
+
+  return target;
+}
+
+function normalizeLegacyFontSize_(size) {
+  const map = {
+    "1": "10px",
+    "2": "13px",
+    "3": "16px",
+    "4": "18px",
+    "5": "24px",
+    "6": "32px",
+    "7": "48px",
+  };
+
+  return map[String(size || "").trim()] || "";
+}
+
+function appendCleanPasteChildren_(target, node) {
+  Array.prototype.forEach.call(node.childNodes, function (child) {
+    const cleaned = cleanPasteNode_(child);
+
+    if (!cleaned) {
+      return;
+    }
+
+    if (cleaned.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+      while (cleaned.firstChild) {
+        target.appendChild(cleaned.firstChild);
+      }
+      return;
+    }
+
+    target.appendChild(cleaned);
+  });
+}
+
+function applySemanticPasteStyles_(tagName, element, styles) {
+  if (tagName === "STRONG" || tagName === "B") {
+    styles["font-weight"] = "bold";
+  }
+
+  if (tagName === "EM" || tagName === "I") {
+    styles["font-style"] = "italic";
+  }
+
+  if (tagName === "U") {
+    styles["text-decoration"] = mergeTextDecoration_(styles["text-decoration"], "underline");
+  }
+
+  if (tagName === "S" || tagName === "STRIKE") {
+    styles["text-decoration"] = mergeTextDecoration_(styles["text-decoration"], "line-through");
+  }
+
+  if (PASTE_BLOCK_TAGS[tagName] && !styles["text-align"]) {
+    const align = element.getAttribute("align");
+
+    if (align) {
+      styles["text-align"] = align.toLowerCase();
+    }
+  }
+
+  return styles;
+}
+
+function mergeTextDecoration_(current, extra) {
+  const parts = String(current || "")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (parts.indexOf(extra) === -1) {
+    parts.push(extra);
+  }
+
+  return parts.join(" ");
+}
+
+function cleanPasteNode_(node) {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return document.createTextNode(node.nodeValue);
+  }
+
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return null;
+  }
+
+  const tagName = node.tagName;
+
+  if (
+    tagName === "META" ||
+    tagName === "STYLE" ||
+    tagName === "SCRIPT" ||
+    tagName === "LINK" ||
+    tagName === "IMG" ||
+    tagName === "IFRAME" ||
+    tagName === "OBJECT" ||
+    tagName === "HEAD" ||
+    tagName === "TITLE"
+  ) {
+    return null;
+  }
+
+  if (!PASTE_ALLOWED_TAGS[tagName]) {
+    const fragment = document.createDocumentFragment();
+    appendCleanPasteChildren_(fragment, node);
+    return fragment;
+  }
+
+  if (tagName === "BR" || tagName === "HR") {
+    return document.createElement(tagName.toLowerCase());
+  }
+
+  let targetTag = tagName.toLowerCase();
+
+  if (tagName === "FONT") {
+    targetTag = "span";
+  }
+
+  if (tagName === "B" || tagName === "STRONG" || tagName === "I" || tagName === "EM" || tagName === "U" || tagName === "S" || tagName === "STRIKE") {
+    targetTag = "span";
+  }
+
+  const element = document.createElement(targetTag);
+  let styles = parsePasteStyles_(node.getAttribute("style"));
+  styles = applySemanticPasteStyles_(tagName, node, styles);
+
+  if (tagName === "FONT") {
+    if (node.getAttribute("color")) {
+      styles.color = node.getAttribute("color");
+    }
+
+    if (node.getAttribute("face")) {
+      styles["font-family"] = node.getAttribute("face");
+    }
+
+    const fontSize = normalizeLegacyFontSize_(node.getAttribute("size"));
+
+    if (fontSize) {
+      styles["font-size"] = fontSize;
+    }
+  }
+
+  if (tagName === "A") {
+    const href = String(node.getAttribute("href") || "").trim();
+
+    if (/^(https?:|mailto:)/i.test(href)) {
+      element.setAttribute("href", href);
+    }
+  }
+
+  const styleAttribute = stylesToAttribute_(styles);
+
+  if (styleAttribute) {
+    element.setAttribute("style", styleAttribute);
+  }
+
+  appendCleanPasteChildren_(element, node);
+  return element;
+}
+
+function sanitizePastedHtml_(html) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(String(html || ""), "text/html");
+  const container = document.createElement("div");
+
+  appendCleanPasteChildren_(container, doc.body);
+
+  return container.innerHTML.trim();
+}
+
+function insertHtmlAtSelection_(html) {
+  focusEditor();
+
+  const selection = window.getSelection();
+
+  if (!selection || selection.rangeCount === 0) {
+    visualEditor.insertAdjacentHTML("beforeend", html);
+    return;
+  }
+
+  const range = selection.getRangeAt(0);
+
+  if (!isRangeInsideEditor(range)) {
+    visualEditor.insertAdjacentHTML("beforeend", html);
+    return;
+  }
+
+  range.deleteContents();
+  range.insertNode(range.createContextualFragment(html));
+  range.collapse(false);
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
+function handleEditorPaste_(event) {
+  const clipboard = event.clipboardData;
+
+  if (!clipboard) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const html = clipboard.getData("text/html");
+  const plain = clipboard.getData("text/plain");
+  let content = "";
+
+  if (html) {
+    content = sanitizePastedHtml_(html);
+  }
+
+  if (!content && plain) {
+    content = escapeHtmlText_(plain).replace(/\r\n/g, "\n").replace(/\n/g, "<br>");
+  }
+
+  if (!content) {
+    return;
+  }
+
+  insertHtmlAtSelection_(content);
+  prepareAllImages();
+  saveEditorSelection();
+  scheduleSyncHtml({ immediate: true });
+  recordHistorySnapshotNow();
+  setStatus("Texto pegado conservando estilos inline.");
+}
+
+function bindPasteHandling() {
+  visualEditor.addEventListener("paste", handleEditorPaste_);
 }
 
 function isLinkedImage(img) {
@@ -184,6 +737,11 @@ function ensureImageRecord(img) {
 
   if (img.src.startsWith("data:")) {
     imageStore.set(id, img.src);
+
+    if (!imageSourceStore.has(id)) {
+      imageSourceStore.set(id, img.src);
+    }
+
     const blobUrl = dataUrlToBlobUrl(img.src);
     revokeBlobUrl(id);
     blobUrlStore.set(id, blobUrl);
@@ -218,6 +776,8 @@ function serializeHtmlCompact() {
     }
   });
 
+  stripImageCaretSlotsFromClone(clone);
+
   return normalizeEditorHtml(clone.innerHTML);
 }
 
@@ -242,6 +802,8 @@ function buildExportHtml() {
       img.removeAttribute("src");
     }
   });
+
+  stripImageCaretSlotsFromClone(clone);
 
   return normalizeEmojisForExport(normalizeEditorHtml(clone.innerHTML));
 }
@@ -346,6 +908,139 @@ function scheduleSyncHtml(options) {
   }, SYNC_DELAY_MS);
 }
 
+function createImageCaretParagraph() {
+  const paragraph = document.createElement("p");
+  paragraph.className = IMAGE_CARET_SLOT_CLASS;
+  paragraph.appendChild(document.createElement("br"));
+  return paragraph;
+}
+
+function isImageCaretSlotElement(element) {
+  return !!(
+    element &&
+    element.nodeType === Node.ELEMENT_NODE &&
+    element.classList &&
+    element.classList.contains(IMAGE_CARET_SLOT_CLASS)
+  );
+}
+
+function isEmptyImageCaretSlot(element) {
+  if (!isImageCaretSlotElement(element)) {
+    return false;
+  }
+
+  return element.textContent.replace(/\u00A0|\u200B/g, "").trim() === "";
+}
+
+function hasCaretPositionBefore(img) {
+  const previous = img.previousSibling;
+
+  if (!previous) {
+    return false;
+  }
+
+  if (previous.nodeType === Node.TEXT_NODE) {
+    return previous.textContent.length > 0;
+  }
+
+  if (previous.nodeType === Node.ELEMENT_NODE) {
+    if (previous.tagName === "IMG") {
+      return false;
+    }
+
+    if (previous.tagName === "BR") {
+      return true;
+    }
+
+    if (/^(P|DIV|H[1-6]|LI|BLOCKQUOTE)$/i.test(previous.tagName)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function hasCaretPositionAfter(img) {
+  const next = img.nextSibling;
+
+  if (!next) {
+    return false;
+  }
+
+  if (next.nodeType === Node.TEXT_NODE) {
+    return next.textContent.length > 0;
+  }
+
+  if (next.nodeType === Node.ELEMENT_NODE) {
+    if (next.tagName === "IMG") {
+      return false;
+    }
+
+    if (next.tagName === "BR") {
+      return true;
+    }
+
+    if (/^(P|DIV|H[1-6]|LI|BLOCKQUOTE)$/i.test(next.tagName)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function ensureImageEditingSpaces(img) {
+  const parent = img.parentNode;
+
+  if (!parent) {
+    return;
+  }
+
+  if (!hasCaretPositionBefore(img)) {
+    parent.insertBefore(createImageCaretParagraph(), img);
+  }
+
+  if (!hasCaretPositionAfter(img)) {
+    const after = createImageCaretParagraph();
+
+    if (img.nextSibling) {
+      parent.insertBefore(after, img.nextSibling);
+    } else {
+      parent.appendChild(after);
+    }
+  }
+}
+
+function placeCaretInImageSlot(img, position) {
+  ensureImageEditingSpaces(img);
+
+  const slot =
+    position === "before" ? img.previousElementSibling : img.nextElementSibling;
+
+  if (!isImageCaretSlotElement(slot)) {
+    return;
+  }
+
+  const range = document.createRange();
+  range.selectNodeContents(slot);
+  range.collapse(position === "before");
+
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+  savedEditorRange = range.cloneRange();
+}
+
+function stripImageCaretSlotsFromClone(root) {
+  root.querySelectorAll("." + IMAGE_CARET_SLOT_CLASS).forEach(function (paragraph) {
+    if (isEmptyImageCaretSlot(paragraph)) {
+      paragraph.remove();
+      return;
+    }
+
+    paragraph.classList.remove(IMAGE_CARET_SLOT_CLASS);
+  });
+}
+
 function prepareImage(img) {
   if (isLinkedImage(img) || /^https?:\/\//i.test(img.getAttribute("src") || "")) {
     img.dataset.imageMode = "linked";
@@ -372,6 +1067,8 @@ function prepareImage(img) {
   if (!img.style.height) {
     img.style.height = "auto";
   }
+
+  ensureImageEditingSpaces(img);
 }
 
 function prepareAllImages() {
@@ -554,24 +1251,17 @@ function insertImageAtCursor(img) {
     if (isRangeInsideEditor(range)) {
       range.deleteContents();
       range.insertNode(img);
-
-      const spacer = document.createTextNode("\u00A0");
-      range.setStartAfter(img);
-      range.collapse(true);
-      range.insertNode(spacer);
-      range.setStartAfter(spacer);
-      range.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(range);
+      ensureImageEditingSpaces(img);
+      placeCaretInImageSlot(img, "after");
       clearImageInsertSelection();
-      savedEditorRange = null;
       return;
     }
   }
 
   visualEditor.appendChild(img);
+  ensureImageEditingSpaces(img);
+  placeCaretInImageSlot(img, "after");
   clearImageInsertSelection();
-  savedEditorRange = null;
 }
 
 function computeImageDimensions(width, height) {
@@ -632,19 +1322,27 @@ function reencodeImageToWidth(dataUrl, targetWidthPx) {
   });
 }
 
+function getImageSourceDataUrl(id) {
+  if (!id) {
+    return null;
+  }
+
+  return imageSourceStore.get(id) || imageStore.get(id) || null;
+}
+
 function updateImageBase64FromWidth(img, targetWidthPx) {
   const id = img.dataset.imageId;
-  const currentDataUrl = id && imageStore.get(id);
+  const sourceDataUrl = getImageSourceDataUrl(id);
   const cappedWidth = Math.min(
     Math.max(20, Math.round(targetWidthPx)),
     IMAGE_MAX_DIMENSION
   );
 
-  if (!currentDataUrl) {
+  if (!sourceDataUrl) {
     return Promise.resolve(null);
   }
 
-  return reencodeImageToWidth(currentDataUrl, cappedWidth).then(function (result) {
+  return reencodeImageToWidth(sourceDataUrl, cappedWidth).then(function (result) {
     revokeBlobUrl(id);
     imageStore.set(id, result.dataUrl);
 
@@ -672,6 +1370,7 @@ function resolveImageWidthPx(value, unit) {
 function finalizeImageResize(img, widthPx, statusPrefix) {
   if (isLinkedImage(img)) {
     scheduleSyncHtml({ immediate: true });
+    recordHistorySnapshotNow();
     setStatus((statusPrefix || "Imagen enlazada redimensionada") + " (" + widthPx + " px de ancho).");
     return Promise.resolve();
   }
@@ -682,6 +1381,7 @@ function finalizeImageResize(img, widthPx, statusPrefix) {
     .then(function (result) {
       if (!result) {
         scheduleSyncHtml({ immediate: true });
+        recordHistorySnapshotNow();
         return;
       }
 
@@ -689,6 +1389,7 @@ function finalizeImageResize(img, widthPx, statusPrefix) {
       imageWidthUnit.value = "px";
       positionImageOverlay();
       scheduleSyncHtml({ immediate: true });
+      recordHistorySnapshotNow();
       setStatus(
         (statusPrefix || "Imagen redimensionada") +
           " (" +
@@ -791,6 +1492,7 @@ function insertCompressedImage(compressedImage) {
   const id = createImageId();
   const blobUrl = dataUrlToBlobUrl(compressedImage.dataUrl);
 
+  imageSourceStore.set(id, compressedImage.dataUrl);
   imageStore.set(id, compressedImage.dataUrl);
   blobUrlStore.set(id, blobUrl);
 
@@ -808,6 +1510,7 @@ function insertCompressedImage(compressedImage) {
   insertImageAtCursor(img);
   selectImage(img);
   scheduleSyncHtml({ immediate: true });
+  recordHistorySnapshotNow();
 
   if (compressedImage.wasResized) {
     setStatus(
@@ -916,6 +1619,7 @@ function insertLinkedImageElement(trimmedUrl) {
     insertImageAtCursor(img);
     selectImage(img);
     scheduleSyncHtml({ immediate: true });
+    recordHistorySnapshotNow();
     closeLinkedImageDialog();
     confirmLinkedImageButton.disabled = false;
     confirmLinkedImageButton.textContent = "Insertar imagen";
@@ -1027,6 +1731,11 @@ function bindImageInteractions() {
       return;
     }
 
+    if (isImageCaretSlotElement(event.target) || isImageCaretSlotElement(event.target.parentElement)) {
+      deselectImage();
+      return;
+    }
+
     if (!imageResizeOverlay.contains(event.target)) {
       deselectImage();
     }
@@ -1107,6 +1816,7 @@ function syncVisualFromHtml() {
   syncingFromHtml = false;
   deselectImage();
   scheduleSyncHtml({ immediate: true, silent: true });
+  resetEditorHistory();
   setStatus("Cambios HTML aplicados al editor visual.");
 }
 
@@ -1123,6 +1833,7 @@ function insertTemplateVariable(token) {
 
   saveEditorSelection();
   scheduleSyncHtml({ immediate: true });
+  recordHistorySnapshotNow();
   setStatus("Variable insertada: " + token);
 }
 
@@ -1235,6 +1946,7 @@ visualEditor.addEventListener("input", function () {
   }
 
   scheduleSyncHtml({ silent: true });
+  scheduleHistorySnapshot();
 });
 
 visualEditor.addEventListener("mouseup", saveEditorSelection);
@@ -1254,9 +1966,12 @@ htmlOutput.addEventListener("blur", updateCharCounter);
 
 bindToolbar();
 bindVariableButtons();
+bindPasteHandling();
+bindUndoRedo();
 bindImageInteractions();
 bindImageResizeDialog();
 bindLinkedImageDialog();
+initEditorHistory();
 scheduleSyncHtml({ immediate: true });
 updateCharCounter();
 setStatus("Listo. Img. embebida (base64) o Img. enlazada (URL). Ambas se pueden redimensionar.");
