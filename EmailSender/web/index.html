@@ -73,6 +73,18 @@
           <button type="button" id="linkedImageButton" title="Insertar imagen visible desde una URL">Img. enlazada</button>
         </div>
 
+        <div class="toolbar-group variable-tools" aria-label="Variables de plantilla">
+          <span class="variable-tools-label">Variables</span>
+          <button type="button" class="variable-button" data-variable="{{NumSocio}}" title="Insertar {{NumSocio}}">NumSocio</button>
+          <button type="button" class="variable-button" data-variable="{{Tutor}}" title="Insertar {{Tutor}}">Tutor</button>
+          <button type="button" class="variable-button" data-variable="{{Email}}" title="Insertar {{Email}}">Email</button>
+          <button type="button" class="variable-button" data-variable="{{Telefono}}" title="Insertar {{Telefono}}">Teléfono</button>
+          <button type="button" class="variable-button" data-variable="{{Pagado}}" title="Insertar {{Pagado}}">Pagado</button>
+          <button type="button" class="variable-button" data-variable="{{Destinatario}}" title="Insertar {{Destinatario}}">Destinatario</button>
+          <button type="button" class="variable-button" data-variable="{{Rol}}" title="Insertar {{Rol}}">Rol</button>
+          <button type="button" class="variable-button" data-variable="{{elmer}}" title="Insertar {{elmer}} (elefante)">elmer</button>
+        </div>
+
         <div class="toolbar-group image-tools" id="imageTools" hidden>
           <span class="image-tools-label" id="imageToolsLabel">Imagen</span>
           <input type="number" id="imageWidthInput" min="20" max="2000" step="1" aria-label="Ancho de imagen">
@@ -181,6 +193,6 @@
     </div>
   </div>
 
-  <script src="js/editor.js?v=2"></script>
+  <script src="js/editor.js?v=3"></script>
 </body>
 </html>

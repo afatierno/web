@@ -999,6 +999,33 @@ function syncVisualFromHtml() {
   setStatus("Cambios HTML aplicados al editor visual.");
 }
 
+function insertTemplateVariable(token) {
+  focusEditor();
+  restoreEditorSelection();
+
+  if (document.queryCommandSupported && document.queryCommandSupported("insertText")) {
+    document.execCommand("insertText", false, token);
+  } else {
+    exec("insertHTML", token.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+    return;
+  }
+
+  saveEditorSelection();
+  scheduleSyncHtml({ immediate: true });
+  setStatus("Variable insertada: " + token);
+}
+
+function bindVariableButtons() {
+  document.querySelectorAll("[data-variable]").forEach(function (button) {
+    button.addEventListener("mousedown", saveEditorSelection);
+
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      insertTemplateVariable(button.dataset.variable);
+    });
+  });
+}
+
 function bindToolbar() {
   document.querySelectorAll("[data-command]").forEach(function (button) {
     button.addEventListener("click", function () {
@@ -1107,6 +1134,7 @@ htmlOutput.addEventListener("focus", updateCharCounter);
 htmlOutput.addEventListener("blur", updateCharCounter);
 
 bindToolbar();
+bindVariableButtons();
 bindImageInteractions();
 bindImageResizeDialog();
 bindLinkedImageDialog();
