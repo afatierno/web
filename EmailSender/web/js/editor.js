@@ -39,6 +39,7 @@ const SHEET_CELL_CHAR_LIMIT = 50000;
 
 let pendingImageInsert = null;
 let savedEditorRange = null;
+let savedImageInsertRange = null;
 
 let syncingFromHtml = false;
 let selectedImage = null;
@@ -173,6 +174,8 @@ function ensureImageRecord(img) {
     return "";
   }
 
+  img.dataset.imageMode = "embedded";
+
   if (!img.dataset.imageId) {
     img.dataset.imageId = createImageId();
   }
@@ -224,15 +227,86 @@ function buildExportHtml() {
   const clone = visualEditor.cloneNode(true);
 
   clone.querySelectorAll("img").forEach(function (img) {
-    const id = img.getAttribute("data-image-id");
+    const id = img.getAttribute("data-image-id") || img.dataset.imageId;
     const dataUrl = id && imageStore.get(id);
+
+    img.removeAttribute("contenteditable");
+    img.removeAttribute("draggable");
 
     if (dataUrl) {
       img.setAttribute("src", dataUrl);
+      return;
+    }
+
+    if (img.getAttribute("src") && img.getAttribute("src").indexOf("blob:") === 0) {
+      img.removeAttribute("src");
     }
   });
 
-  return normalizeEditorHtml(clone.innerHTML);
+  return normalizeEmojisForExport(normalizeEditorHtml(clone.innerHTML));
+}
+
+function normalizeEmojisForExport(text) {
+  const value = String(text || "");
+  let result = "";
+  let index = 0;
+
+  while (index < value.length) {
+    if (value.charAt(index) === "&") {
+      const entityEnd = value.indexOf(";", index);
+
+      if (entityEnd !== -1 && entityEnd - index < 16) {
+        const entity = value.substring(index, entityEnd + 1);
+
+        if (/^&#(?:x[0-9a-fA-F]+|\d+);$/.test(entity) || /^&[a-zA-Z][a-zA-Z0-9]*;/.test(entity)) {
+          result += entity;
+          index = entityEnd + 1;
+          continue;
+        }
+      }
+    }
+
+    const codePoint = value.codePointAt(index);
+
+    if (isEmojiCodePoint(codePoint)) {
+      result += "&#x" + codePoint.toString(16).toUpperCase() + ";";
+      index += codePoint > 0xffff ? 2 : 1;
+      continue;
+    }
+
+    result += String.fromCodePoint(codePoint);
+    index += codePoint > 0xffff ? 2 : 1;
+  }
+
+  return result;
+}
+
+function isEmojiCodePoint(codePoint) {
+  if (codePoint < 0x80) {
+    return false;
+  }
+
+  if (codePoint === 0x200d || codePoint === 0xfe0f) {
+    return true;
+  }
+
+  return (
+    (codePoint >= 0x1f300 && codePoint <= 0x1faff) ||
+    (codePoint >= 0x1f600 && codePoint <= 0x1f64f) ||
+    (codePoint >= 0x1f680 && codePoint <= 0x1f6ff) ||
+    (codePoint >= 0x1f900 && codePoint <= 0x1f9ff) ||
+    (codePoint >= 0x1f1e6 && codePoint <= 0x1f1ff) ||
+    (codePoint >= 0x2600 && codePoint <= 0x26ff) ||
+    (codePoint >= 0x2700 && codePoint <= 0x27bf) ||
+    (codePoint >= 0x2300 && codePoint <= 0x23ff) ||
+    (codePoint >= 0x2b05 && codePoint <= 0x2b55) ||
+    codePoint === 0x2764 ||
+    codePoint === 0x24c2 ||
+    codePoint === 0x00a9 ||
+    codePoint === 0x00ae ||
+    codePoint === 0x203c ||
+    codePoint === 0x2049
+  );
 }
 
 function flushSyncHtml(options) {
@@ -243,7 +317,7 @@ function flushSyncHtml(options) {
   }
 
   syncTimer = null;
-  const nextHtml = serializeHtmlCompact();
+  const nextHtml = buildExportHtml();
 
   if (htmlOutput.value !== nextHtml) {
     htmlOutput.value = nextHtml;
@@ -276,6 +350,7 @@ function prepareImage(img) {
   if (isLinkedImage(img) || /^https?:\/\//i.test(img.getAttribute("src") || "")) {
     img.dataset.imageMode = "linked";
   } else {
+    img.dataset.imageMode = "embedded";
     ensureImageRecord(img);
   }
 
@@ -432,6 +507,15 @@ function saveEditorSelection() {
   savedEditorRange = null;
 }
 
+function saveImageInsertSelection() {
+  const selection = window.getSelection();
+
+  if (selection && selection.rangeCount > 0 && isRangeInsideEditor(selection.getRangeAt(0))) {
+    savedImageInsertRange = selection.getRangeAt(0).cloneRange();
+    savedEditorRange = savedImageInsertRange.cloneRange();
+  }
+}
+
 function restoreEditorSelection() {
   if (!savedEditorRange) {
     return;
@@ -442,9 +526,25 @@ function restoreEditorSelection() {
   selection.addRange(savedEditorRange);
 }
 
+function restoreImageInsertSelection() {
+  const selection = window.getSelection();
+  const range = savedImageInsertRange || savedEditorRange;
+
+  if (!range) {
+    return;
+  }
+
+  selection.removeAllRanges();
+  selection.addRange(range.cloneRange());
+}
+
+function clearImageInsertSelection() {
+  savedImageInsertRange = null;
+}
+
 function insertImageAtCursor(img) {
   focusEditor();
-  restoreEditorSelection();
+  restoreImageInsertSelection();
 
   const selection = window.getSelection();
 
@@ -454,16 +554,23 @@ function insertImageAtCursor(img) {
     if (isRangeInsideEditor(range)) {
       range.deleteContents();
       range.insertNode(img);
+
+      const spacer = document.createTextNode("\u00A0");
       range.setStartAfter(img);
+      range.collapse(true);
+      range.insertNode(spacer);
+      range.setStartAfter(spacer);
       range.collapse(true);
       selection.removeAllRanges();
       selection.addRange(range);
+      clearImageInsertSelection();
       savedEditorRange = null;
       return;
     }
   }
 
   visualEditor.appendChild(img);
+  clearImageInsertSelection();
   savedEditorRange = null;
 }
 
@@ -528,12 +635,16 @@ function reencodeImageToWidth(dataUrl, targetWidthPx) {
 function updateImageBase64FromWidth(img, targetWidthPx) {
   const id = img.dataset.imageId;
   const currentDataUrl = id && imageStore.get(id);
+  const cappedWidth = Math.min(
+    Math.max(20, Math.round(targetWidthPx)),
+    IMAGE_MAX_DIMENSION
+  );
 
   if (!currentDataUrl) {
     return Promise.resolve(null);
   }
 
-  return reencodeImageToWidth(currentDataUrl, targetWidthPx).then(function (result) {
+  return reencodeImageToWidth(currentDataUrl, cappedWidth).then(function (result) {
     revokeBlobUrl(id);
     imageStore.set(id, result.dataUrl);
 
@@ -714,8 +825,6 @@ function insertCompressedImage(compressedImage) {
 }
 
 function insertImageFromFile(file) {
-  saveEditorSelection();
-
   compressImageFile(file)
     .then(function (compressedImage) {
       if (compressedImage.wasResized) {
@@ -727,8 +836,8 @@ function insertImageFromFile(file) {
 
       insertCompressedImage(compressedImage);
     })
-    .catch(function () {
-      setStatus("No se pudo procesar la imagen seleccionada.");
+    .catch(function (err) {
+      setStatus("No se pudo procesar la imagen seleccionada: " + (err && err.message ? err.message : ""));
     })
     .finally(function () {
       embeddedImageInput.value = "";
@@ -900,11 +1009,13 @@ function bindImageResizeDialog() {
   cancelImageInsertButton.addEventListener("click", function (event) {
     event.preventDefault();
     closeImageResizeDialog();
+    clearImageInsertSelection();
   });
 
   closeImageResizeDialogButton.addEventListener("click", function (event) {
     event.preventDefault();
     closeImageResizeDialog();
+    clearImageInsertSelection();
   });
 }
 
@@ -1067,7 +1178,13 @@ function bindToolbar() {
     }
   });
 
-  embeddedImageInput.addEventListener("mousedown", saveEditorSelection);
+  embeddedImageInput.addEventListener("mousedown", saveImageInsertSelection);
+
+  const embeddedImageLabel = embeddedImageInput.closest(".file-button");
+
+  if (embeddedImageLabel) {
+    embeddedImageLabel.addEventListener("mousedown", saveImageInsertSelection);
+  }
 
   embeddedImageInput.addEventListener("change", function (event) {
     const file = event.target.files && event.target.files[0];
@@ -1092,7 +1209,7 @@ function bindToolbar() {
 
     try {
       await navigator.clipboard.writeText(exportHtml);
-      htmlOutput.value = serializeHtmlCompact();
+      htmlOutput.value = exportHtml;
       setStatus("HTML completo copiado al portapapeles.");
     } catch (err) {
       htmlOutput.value = exportHtml;
@@ -1101,6 +1218,8 @@ function bindToolbar() {
       document.execCommand("copy");
       setStatus("HTML completo copiado al portapapeles.");
     }
+
+    updateCharCounter();
   });
 
   applyHtmlButton.addEventListener("click", function () {
