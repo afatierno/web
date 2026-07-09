@@ -128,6 +128,31 @@ header p {
   display: none;
 }
 
+.variable-tools {
+  flex-wrap: wrap;
+}
+
+.variable-tools-label {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 600;
+  margin-right: 2px;
+}
+
+.toolbar button.variable-button {
+  min-width: 0;
+  padding: 0 8px;
+  font-size: 0.78rem;
+  font-family: "Courier New", monospace;
+  background: #f8fafc;
+  color: #1e3a8a;
+}
+
+.toolbar button.variable-button:hover {
+  background: #dbeafe;
+  border-color: var(--accent);
+}
+
 .panels {
   display: grid;
   grid-template-columns: 1fr 1fr;
