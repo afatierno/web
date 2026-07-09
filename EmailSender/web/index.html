@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EmailSender · Editor HTML</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>Editor HTML para correos</h1>
+      <p>Redacta el cuerpo del email y copia el HTML resultante a la hoja <strong>email</strong> del Google Sheet.</p>
+    </header>
+
+    <div class="editor-shell">
+      <div class="toolbar" aria-label="Herramientas de formato">
+        <div class="toolbar-group">
+          <button type="button" data-command="bold" title="Negrita"><strong>B</strong></button>
+          <button type="button" data-command="italic" title="Cursiva"><em>I</em></button>
+          <button type="button" data-command="underline" title="Subrayado"><u>U</u></button>
+          <button type="button" data-command="strikeThrough" title="Tachado"><s>S</s></button>
+        </div>
+
+        <div class="toolbar-group">
+          <select id="fontFamilySelect" aria-label="Tipo de letra">
+            <option value="">Fuente</option>
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="'Segoe UI', sans-serif">Segoe UI</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
+            <option value="Verdana, sans-serif">Verdana</option>
+            <option value="'Courier New', monospace">Courier New</option>
+          </select>
+
+          <select id="fontSizeSelect" aria-label="Tamaño de letra">
+            <option value="">Tamaño</option>
+            <option value="12px">12 px</option>
+            <option value="14px">14 px</option>
+            <option value="16px">16 px</option>
+            <option value="18px">18 px</option>
+            <option value="20px">20 px</option>
+            <option value="24px">24 px</option>
+            <option value="28px">28 px</option>
+            <option value="32px">32 px</option>
+          </select>
+        </div>
+
+        <div class="toolbar-group">
+          <input type="color" id="textColorInput" value="#111827" title="Color de texto" aria-label="Color de texto">
+          <input type="color" id="backgroundColorInput" value="#ffff00" title="Color de fondo" aria-label="Color de fondo">
+        </div>
+
+        <div class="toolbar-group">
+          <button type="button" data-command="justifyLeft" title="Alinear izquierda">Izq</button>
+          <button type="button" data-command="justifyCenter" title="Centrar">Centro</button>
+          <button type="button" data-command="justifyRight" title="Alinear derecha">Der</button>
+        </div>
+
+        <div class="toolbar-group">
+          <button type="button" data-command="insertUnorderedList" title="Lista con viñetas">• Lista</button>
+          <button type="button" data-command="insertOrderedList" title="Lista numerada">1. Lista</button>
+          <button type="button" id="linkButton" title="Insertar enlace">Enlace</button>
+          <button type="button" data-command="insertHorizontalRule" title="Línea horizontal">HR</button>
+        </div>
+
+        <div class="toolbar-group">
+          <button type="button" data-command="removeFormat" title="Quitar formato">Limpiar</button>
+          <label class="file-button" title="Insertar imagen embebida en base64 (ocupa espacio en el HTML)">
+            Img. embebida
+            <input type="file" id="embeddedImageInput" accept="image/*">
+          </label>
+          <button type="button" id="linkedImageButton" title="Insertar imagen visible desde una URL">Img. enlazada</button>
+        </div>
+
+        <div class="toolbar-group image-tools" id="imageTools" hidden>
+          <span class="image-tools-label" id="imageToolsLabel">Imagen</span>
+          <input type="number" id="imageWidthInput" min="20" max="2000" step="1" aria-label="Ancho de imagen">
+          <select id="imageWidthUnit" aria-label="Unidad de ancho">
+            <option value="px">px</option>
+            <option value="%">%</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="panels">
+        <section class="panel" aria-label="Editor visual">
+          <div class="panel-header">
+            <h2>Redacción</h2>
+          </div>
+          <div class="panel-body editor-container">
+            <div id="visualEditor" contenteditable="true" spellcheck="true"></div>
+            <div id="imageResizeOverlay" hidden>
+              <div class="resize-handle" title="Arrastra para redimensionar"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" aria-label="Código HTML">
+          <div class="panel-header">
+            <h2>HTML</h2>
+            <div class="panel-actions">
+              <button type="button" id="applyHtmlButton">Aplicar al editor</button>
+              <button type="button" id="copyHtmlButton" class="primary">Copiar HTML</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <textarea id="htmlOutput" spellcheck="false" aria-label="Código HTML generado"></textarea>
+          </div>
+        </section>
+      </div>
+
+      <div class="status-bar">
+        <span id="statusBar">Cargando editor…</span>
+        <span id="charCounter" class="char-counter" title="Caracteres del HTML al copiar (límite Google Sheets: 50.000 por celda)">0 / 50.000</span>
+      </div>
+    </div>
+  </div>
+
+  <dialog id="imageResizeDialog">
+    <div class="image-resize-dialog">
+      <header class="image-resize-dialog-header">
+        <h2>Imagen demasiado grande</h2>
+        <button type="button" id="closeImageResizeDialog" class="dialog-close" aria-label="Cerrar">×</button>
+      </header>
+
+      <p id="imageResizeIntro" class="image-resize-intro">
+        Para que el HTML quepa en Google Sheets (máx. 50&nbsp;000 caracteres por celda), las imágenes se reducen a 200&nbsp;px como máximo.
+      </p>
+
+      <dl class="image-resize-stats">
+        <div>
+          <dt>Tamaño original</dt>
+          <dd id="imageResizeOriginal">—</dd>
+        </div>
+        <div>
+          <dt>Tamaño final</dt>
+          <dd id="imageResizeFinal">—</dd>
+        </div>
+        <div>
+          <dt>Tamaño estimado en HTML</dt>
+          <dd id="imageResizeChars">—</dd>
+        </div>
+      </dl>
+
+      <footer class="image-resize-dialog-footer">
+        <button type="button" id="cancelImageInsert">Cancelar</button>
+        <button type="button" id="confirmImageInsert" class="primary">Insertar imagen reducida</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <div id="linkedImageModal" class="editor-modal" hidden>
+    <button type="button" class="editor-modal-backdrop" id="linkedImageBackdrop" aria-label="Cerrar"></button>
+    <div class="editor-modal-panel image-resize-dialog" role="dialog" aria-modal="true" aria-labelledby="linkedImageTitle">
+      <header class="image-resize-dialog-header">
+        <h2 id="linkedImageTitle">Imagen enlazada</h2>
+        <button type="button" id="closeLinkedImageDialog" class="dialog-close" aria-label="Cerrar">×</button>
+      </header>
+
+      <p class="image-resize-intro">
+        Pega la URL pública de la imagen. El correo mostrará la imagen, pero el HTML solo guardará el enlace.
+      </p>
+
+      <div class="linked-image-form">
+        <label for="linkedImageUrlInput">URL de la imagen</label>
+        <input
+          type="url"
+          id="linkedImageUrlInput"
+          placeholder="https://ejemplo.com/imagen.jpg"
+          spellcheck="false"
+          autocomplete="off"
+        >
+        <p id="linkedImageError" class="linked-image-error" hidden></p>
+      </div>
+
+      <footer class="image-resize-dialog-footer">
+        <button type="button" id="cancelLinkedImage">Cancelar</button>
+        <button type="button" id="confirmLinkedImage" class="primary">Insertar imagen</button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="js/editor.js?v=2"></script>
+</body>
+</html>
