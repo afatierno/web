@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Carnet de socio</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <p class="page-eyebrow">AMPA/AFA Enrique Tierno Galván</p>
+      <h1>Carnet de socio</h1>
+    </header>
+
+    <p id="status-message" class="status-message" aria-live="polite"></p>
+
+    <section id="carnet-card" class="carnet-card" hidden>
+      <div id="carnet-content"></div>
+    </section>
+  </main>
+
+  <button
+    id="pdf-button"
+    type="button"
+    class="action-fab pdf-fab"
+    hidden
+    aria-label="Ver carnet certificado en PDF"
+    title="Carnet certificado (PDF)"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <path d="M14 2v6h6"></path>
+      <path d="M8 13h8"></path>
+      <path d="M8 17h5"></path>
+    </svg>
+  </button>
+
+  <button
+    id="info-button"
+    type="button"
+    class="action-fab info-fab"
+    aria-label="Información sobre el carnet"
+    title="Información"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M12 10v6"></path>
+      <circle cx="12" cy="7.25" r="1.1"></circle>
+    </svg>
+  </button>
+
+  <div id="pdf-modal" class="app-modal pdf-modal" hidden aria-hidden="true">
+    <div class="app-modal-backdrop" data-close-modal="pdf"></div>
+    <div
+      class="app-modal-panel pdf-modal-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="pdf-modal-title"
+    >
+      <header class="app-modal-header">
+        <h2 id="pdf-modal-title">Carnet certificado</h2>
+        <button type="button" class="app-modal-close" data-close-modal="pdf" aria-label="Cerrar">
+          ×
+        </button>
+      </header>
+      <p class="pdf-modal-intro">Documento firmado digitalmente por la AFA.</p>
+      <div class="pdf-viewer-wrap">
+        <iframe
+          id="pdf-frame"
+          class="pdf-frame"
+          title="Carnet certificado en PDF"
+          loading="lazy"
+        ></iframe>
+      </div>
+      <div class="pdf-modal-actions">
+        <a id="pdf-download-link" class="pdf-action-button primary" href="#" download>
+          Descargar PDF
+        </a>
+        <a id="pdf-open-link" class="pdf-action-button secondary" href="#" target="_blank" rel="noopener noreferrer">
+          Abrir en nueva pestaña
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="info-modal" class="app-modal info-modal" hidden aria-hidden="true">
+    <div class="app-modal-backdrop" data-close-modal="info"></div>
+    <div
+      class="app-modal-panel info-modal-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="info-modal-title"
+    >
+      <header class="app-modal-header">
+        <h2 id="info-modal-title">Información</h2>
+        <button type="button" class="app-modal-close" data-close-modal="info" aria-label="Cerrar">
+          ×
+        </button>
+      </header>
+      <ul id="info-list" class="info-modal-list"></ul>
+    </div>
+  </div>
+
+  <script src="js/app.js" type="module"></script>
+</body>
+</html>
