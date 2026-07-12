@@ -4,9 +4,6 @@ const UUID_V4_REGEX =
 const CONFIG_PARAM = "c";
 const SESSION_KEY = "afa.carnet.access";
 
-/** Incrementar en cada cambio (vXXXX). Mantener igual que en index.html. */
-export const APP_VERSION = "0004";
-
 /** PDF certificado firmado (ruta fija en el sitio). */
 export const CERTIFIED_PDF_URL = "assets/pdf/carnet-certificado.pdf";
 export const CERTIFIED_PDF_FILENAME = "carnet-certificado.pdf";

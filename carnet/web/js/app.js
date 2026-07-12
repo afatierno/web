@@ -1,5 +1,4 @@
 import {
-  APP_VERSION,
   CERTIFIED_PDF_FILENAME,
   CERTIFIED_PDF_URL,
   CONFIG,
@@ -25,7 +24,6 @@ const pdfFrame = document.getElementById("pdf-frame");
 const pdfDownloadLink = document.getElementById("pdf-download-link");
 const pdfOpenLink = document.getElementById("pdf-open-link");
 const infoList = document.getElementById("info-list");
-const appVersion = document.getElementById("app-version");
 
 let activeController = null;
 let openModalId = null;
@@ -134,9 +132,4 @@ document.addEventListener("keydown", function (event) {
 
 configurePdfLinks();
 renderInfoMessages(infoList, INFO_MESSAGES);
-
-if (appVersion) {
-  appVersion.textContent = "v" + APP_VERSION;
-}
-
 loadCarnet();
