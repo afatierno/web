@@ -1,3 +1,5 @@
+import { VALIDATION_PAGE_URL } from "./config.js?v=0012";
+
 /** Requiere qrcode-lib.js cargado antes (global qrcode). */
 export function renderQrCode(container, text) {
   if (typeof qrcode !== "function") {
@@ -15,11 +17,7 @@ export function renderQrCode(container, text) {
   container.replaceChildren(wrap);
 }
 
-export function buildValidationPageUrl() {
-  return window.location.href.replace(/index\.html(?:[?#].*)?$/, "validacion.html");
-}
-
 export function buildValidationAccessUrl(validationToken, apiUrl) {
   const encoded = btoa(validationToken + "|" + apiUrl);
-  return buildValidationPageUrl() + "?c=" + encodeURIComponent(encoded);
+  return VALIDATION_PAGE_URL + "?c=" + encodeURIComponent(encoded);
 }

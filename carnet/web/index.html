@@ -1,68 +1,135 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <meta name="theme-color" content="#ffffff">
-  <title>Carnet de socio</title>
-  <link rel="stylesheet" href="css/styles.css?v=0009">
-</head>
-<body>
-  <main class="page">
-    <header class="page-header">
-      <p class="page-eyebrow">AMPA/AFA Enrique Tierno Galván</p>
-      <h1>Carnet de socio <span id="app-version" class="app-version">v0009</span></h1>
-    </header>
-
-    <p id="status-message" class="status-message" aria-live="polite"></p>
-
-    <section id="carnet-card" class="carnet-card" hidden>
-      <div id="carnet-content"></div>
-      <div id="validation-qr-section" class="validation-qr-section" hidden>
-        <h2 class="validation-qr-title">Validación</h2>
-        <p class="validation-qr-intro">Escanea este código para comprobar que el carnet es válido.</p>
-        <div id="validation-qr" class="validation-qr"></div>
-      </div>
-    </section>
-  </main>
-
-  <button
-    id="info-button"
-    type="button"
-    class="action-fab info-fab"
-    aria-label="Información sobre el carnet"
-    title="Información"
-  >
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <circle cx="12" cy="12" r="10"></circle>
-      <path d="M12 10v6"></path>
-      <circle cx="12" cy="7.25" r="1.1"></circle>
-    </svg>
-  </button>
-
-  <div id="info-modal" class="app-modal info-modal" hidden aria-hidden="true">
-    <div class="app-modal-backdrop" data-close-modal="info"></div>
-    <div
-      class="app-modal-panel info-modal-panel"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="info-modal-title"
-    >
-      <header class="app-modal-header">
-        <h2 id="info-modal-title">Información</h2>
-        <button type="button" class="app-modal-close" data-close-modal="info" aria-label="Cerrar">
-          ×
-        </button>
-      </header>
-      <ul id="info-list" class="info-modal-list"></ul>
-    </div>
-  </div>
-
-  <script src="js/qrcode-lib.js"></script>
-  <script src="js/app.js?v=0009" type="module"></script>
-</body>
-</html>
-
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+
+  <meta http-equiv="Pragma" content="no-cache">
+
+  <meta http-equiv="Expires" content="0">
+
+  <meta name="theme-color" content="#ffffff">
+
+  <title>Carnet de socio</title>
+
+  <link rel="stylesheet" href="css/styles.css?v=0012">
+
+</head>
+
+<body>
+
+  <main class="page">
+
+    <header class="page-header">
+
+      <p class="page-eyebrow">AMPA/AFA Enrique Tierno Galván</p>
+
+      <h1>Carnet de socio <span id="app-version" class="app-version">v0012</span></h1>
+
+    </header>
+
+
+
+    <p id="status-message" class="status-message" aria-live="polite"></p>
+
+
+
+    <section id="carnet-card" class="carnet-card" hidden>
+
+      <div id="carnet-content"></div>
+
+      <div id="validation-qr-section" class="validation-qr-section" hidden>
+
+        <h2 class="validation-qr-title">Validación</h2>
+
+        <p class="validation-qr-intro">Escanea este código para comprobar que el carnet es válido.</p>
+
+        <div id="validation-qr" class="validation-qr"></div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+
+  <button
+
+    id="info-button"
+
+    type="button"
+
+    class="action-fab info-fab"
+
+    aria-label="Información sobre el carnet"
+
+    title="Información"
+
+  >
+
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+
+      <circle cx="12" cy="12" r="10"></circle>
+
+      <path d="M12 10v6"></path>
+
+      <circle cx="12" cy="7.25" r="1.1"></circle>
+
+    </svg>
+
+  </button>
+
+
+
+  <div id="info-modal" class="app-modal info-modal" hidden aria-hidden="true">
+
+    <div class="app-modal-backdrop" data-close-modal="info"></div>
+
+    <div
+
+      class="app-modal-panel info-modal-panel"
+
+      role="dialog"
+
+      aria-modal="true"
+
+      aria-labelledby="info-modal-title"
+
+    >
+
+      <header class="app-modal-header">
+
+        <h2 id="info-modal-title">Información</h2>
+
+        <button type="button" class="app-modal-close" data-close-modal="info" aria-label="Cerrar">
+
+          ×
+
+        </button>
+
+      </header>
+
+      <ul id="info-list" class="info-modal-list"></ul>
+
+    </div>
+
+  </div>
+
+
+
+  <script src="js/qrcode-lib.js"></script>
+
+  <script src="js/app.js?v=0012" type="module"></script>
+
+</body>
+
+</html>
+
+
