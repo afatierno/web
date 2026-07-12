@@ -1,4 +1,4 @@
-import { VALIDATION_PAGE_URL } from "./config.js?v=0014";
+import { VALIDATION_PAGE_URL } from "./config.js";
 
 /** Requiere qrcode-lib.js cargado antes (global qrcode). */
 export function renderQrCode(container, text) {

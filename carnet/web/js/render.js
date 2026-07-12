@@ -2,6 +2,20 @@ function hasText(value) {
   return String(value || "").trim().length > 0;
 }
 
+function formatFieldLabel(header) {
+  const label = String(header || "").trim();
+
+  if (/^Tutor\s*[12]$/i.test(label)) {
+    return "Tutor/a";
+  }
+
+  if (/^Alumno\s*[1-4]$/i.test(label)) {
+    return "Alumno/a";
+  }
+
+  return label;
+}
+
 export function buildCarnetFields(headers, values) {
   const fields = [];
 
@@ -13,7 +27,7 @@ export function buildCarnetFields(headers, values) {
     }
 
     fields.push({
-      label: String(header || "").trim(),
+      label: formatFieldLabel(header),
       value: String(value).trim(),
     });
   });
