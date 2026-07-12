@@ -4,15 +4,15 @@ import {
   CONFIG_ERROR,
   CONFIG_PENDING_REDIRECT,
   INFO_MESSAGES,
-} from "./config.js?v=0014";
+} from "./config.js";
 import {
   buildCarnetFields,
   renderCarnetCard,
   renderInfoMessages,
   setStatusMessage,
-} from "./render.js?v=0014";
-import { fetchCarnet } from "./api.js?v=0014";
-import { buildValidationAccessUrl, renderQrCode } from "./qr.js?v=0014";
+} from "./render.js";
+import { fetchCarnet } from "./api.js";
+import { buildValidationAccessUrl, renderQrCode } from "./qr.js";
 
 const UUID_V4_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
