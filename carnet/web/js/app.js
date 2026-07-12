@@ -1,52 +1,38 @@
 import {
-  CERTIFIED_PDF_FILENAME,
-  CERTIFIED_PDF_URL,
   CONFIG,
   CONFIG_ERROR,
   CONFIG_PENDING_REDIRECT,
   INFO_MESSAGES,
-} from "./config.js?v=0006";
+} from "./config.js?v=0009";
 import {
   buildCarnetFields,
   renderCarnetCard,
   renderInfoMessages,
   setStatusMessage,
-} from "./render.js?v=0006";
-import { fetchCarnet } from "./api.js?v=0006";
+} from "./render.js?v=0009";
+import { fetchCarnet } from "./api.js?v=0009";
+import { buildValidationAccessUrl, renderQrCode } from "./qr.js?v=0009";
+
+const UUID_V4_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const carnetCard = document.getElementById("carnet-card");
 const carnetContent = document.getElementById("carnet-content");
+const validationQrSection = document.getElementById("validation-qr-section");
+const validationQr = document.getElementById("validation-qr");
 const statusMessage = document.getElementById("status-message");
-const pdfButton = document.getElementById("pdf-button");
 const infoButton = document.getElementById("info-button");
-const pdfModal = document.getElementById("pdf-modal");
 const infoModal = document.getElementById("info-modal");
-const pdfFrame = document.getElementById("pdf-frame");
-const pdfDownloadLink = document.getElementById("pdf-download-link");
-const pdfOpenLink = document.getElementById("pdf-open-link");
 const infoList = document.getElementById("info-list");
 
 let activeController = null;
 let openModalId = null;
 
-function configurePdfLinks() {
-  pdfFrame.src = CERTIFIED_PDF_URL;
-  pdfDownloadLink.href = CERTIFIED_PDF_URL;
-  pdfDownloadLink.download = CERTIFIED_PDF_FILENAME;
-  pdfOpenLink.href = CERTIFIED_PDF_URL;
-}
-
-function setPdfButtonVisible(visible) {
-  pdfButton.hidden = !visible;
-}
-
-function openModal(modalId) {
-  closeModal();
-
-  const modal = modalId === "pdf" ? pdfModal : infoModal;
-  modal.hidden = false;
-  modal.setAttribute("aria-hidden", "false");
-  openModalId = modalId;
+function openModal() {
+  infoModal.hidden = false;
+  infoModal.classList.add("is-open");
+  infoModal.setAttribute("aria-hidden", "false");
+  openModalId = "info";
   document.body.classList.add("modal-open");
 }
 
@@ -55,22 +41,20 @@ function closeModal() {
     return;
   }
 
-  const modal = openModalId === "pdf" ? pdfModal : infoModal;
-  modal.hidden = true;
-  modal.setAttribute("aria-hidden", "true");
+  infoModal.hidden = true;
+  infoModal.classList.remove("is-open");
+  infoModal.setAttribute("aria-hidden", "true");
   openModalId = null;
   document.body.classList.remove("modal-open");
 }
 
 function showLoading() {
   carnetCard.hidden = true;
-  setPdfButtonVisible(false);
   setStatusMessage(statusMessage, "Cargando carnet…", "loading");
 }
 
 function showError(message) {
   carnetCard.hidden = true;
-  setPdfButtonVisible(false);
   setStatusMessage(statusMessage, message, "error");
 }
 
@@ -79,9 +63,19 @@ function showCarnet(data) {
 
   renderCarnetCard(carnetContent, fields);
   carnetCard.hidden = false;
-  setPdfButtonVisible(true);
   statusMessage.textContent = "";
   statusMessage.className = "status-message";
+
+  const validationToken = String(data.validationToken || "").trim();
+
+  if (validationToken && UUID_V4_REGEX.test(validationToken) && CONFIG) {
+    const validationUrl = buildValidationAccessUrl(validationToken, CONFIG.API_URL);
+    renderQrCode(validationQr, validationUrl);
+    validationQrSection.hidden = false;
+  } else {
+    validationQrSection.hidden = true;
+    validationQr.replaceChildren();
+  }
 }
 
 async function loadCarnet() {
@@ -111,18 +105,10 @@ async function loadCarnet() {
   }
 }
 
-pdfButton.addEventListener("click", function () {
-  openModal("pdf");
-});
-
-infoButton.addEventListener("click", function () {
-  openModal("info");
-});
+infoButton.addEventListener("click", openModal);
 
 document.querySelectorAll("[data-close-modal]").forEach(function (element) {
-  element.addEventListener("click", function () {
-    closeModal();
-  });
+  element.addEventListener("click", closeModal);
 });
 
 document.addEventListener("keydown", function (event) {
@@ -131,7 +117,6 @@ document.addEventListener("keydown", function (event) {
   }
 });
 
-configurePdfLinks();
 renderInfoMessages(infoList, INFO_MESSAGES);
 
 if (!CONFIG_PENDING_REDIRECT) {
