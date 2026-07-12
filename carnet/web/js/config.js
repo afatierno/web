@@ -4,6 +4,10 @@ const UUID_V4_REGEX =
 const CONFIG_PARAM = "c";
 const SESSION_KEY = "afa.carnet.access";
 
+/** Si hay ?c= en la URL, guardamos y recargamos sin ese parámetro (fuerza JS nuevo). */
+let bootstrapConfigError_ = null;
+const CONFIG_PENDING_REDIRECT = bootstrapAccessConfig_();
+
 /** PDF certificado firmado (ruta fija en el sitio). */
 export const CERTIFIED_PDF_URL = "assets/pdf/carnet-certificado.pdf";
 export const CERTIFIED_PDF_FILENAME = "carnet-certificado.pdf";
@@ -58,24 +62,35 @@ function stripConfigFromUrl() {
   history.replaceState(null, document.title, cleanUrl);
 }
 
-function loadEncodedConfig() {
+function bootstrapAccessConfig_() {
   const params = new URLSearchParams(window.location.search);
   const fromUrl = params.get(CONFIG_PARAM);
 
-  if (fromUrl) {
-    stripConfigFromUrl();
-
-    const parsedFromUrl = parseEncodedConfig(fromUrl);
-
-    if (parsedFromUrl.error) {
-      sessionStorage.removeItem(SESSION_KEY);
-      return fromUrl;
-    }
-
-    sessionStorage.setItem(SESSION_KEY, fromUrl);
-    return fromUrl;
+  if (!fromUrl) {
+    return false;
   }
 
+  const parsedFromUrl = parseEncodedConfig(fromUrl);
+
+  if (parsedFromUrl.error) {
+    sessionStorage.removeItem(SESSION_KEY);
+    bootstrapConfigError_ = parsedFromUrl.error;
+    stripConfigFromUrl();
+    return false;
+  }
+
+  sessionStorage.setItem(SESSION_KEY, fromUrl);
+
+  if (window.location.search) {
+    const cleanUrl = window.location.pathname + window.location.hash;
+    window.location.replace(cleanUrl);
+    return true;
+  }
+
+  return false;
+}
+
+function loadEncodedConfig() {
   return sessionStorage.getItem(SESSION_KEY);
 }
 
@@ -119,14 +134,6 @@ function parseEncodedConfig(encoded) {
     return { error: "La URL del script no es válida" };
   }
 
-  if (isShortenerApiUrl_(apiUrl)) {
-    return {
-      error:
-        "La URL del script no puede ser un acortador (TinyURL, bit.ly, etc.). " +
-        "En config use la URL directa de Apps Script que termina en /exec",
-    };
-  }
-
   return {
     config: {
       UUID: uuid,
@@ -135,8 +142,13 @@ function parseEncodedConfig(encoded) {
   };
 }
 
-const parsed = parseEncodedConfig(loadEncodedConfig());
+const parsed = CONFIG_PENDING_REDIRECT
+  ? { config: null, error: null }
+  : bootstrapConfigError_
+    ? { error: bootstrapConfigError_ }
+    : parseEncodedConfig(loadEncodedConfig());
 
+export { CONFIG_PENDING_REDIRECT };
 export const CONFIG_ERROR = parsed.error || null;
 export const CONFIG = parsed.config || null;
 
@@ -146,21 +158,4 @@ export function encodeAccessConfig(uuid, apiUrl) {
 
 export function clearAccessSession() {
   sessionStorage.removeItem(SESSION_KEY);
-}
-
-function isShortenerApiUrl_(url) {
-  try {
-    const host = new URL(url).hostname.toLowerCase();
-
-    return (
-      host === "tinyurl.com" ||
-      host.endsWith(".tinyurl.com") ||
-      host === "bit.ly" ||
-      host === "t.co" ||
-      host === "goo.gl" ||
-      host === "is.gd"
-    );
-  } catch {
-    return false;
-  }
 }

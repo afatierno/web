@@ -3,15 +3,16 @@ import {
   CERTIFIED_PDF_URL,
   CONFIG,
   CONFIG_ERROR,
+  CONFIG_PENDING_REDIRECT,
   INFO_MESSAGES,
-} from "./config.js?v=0004";
+} from "./config.js?v=0006";
 import {
   buildCarnetFields,
   renderCarnetCard,
   renderInfoMessages,
   setStatusMessage,
-} from "./render.js?v=0004";
-import { fetchCarnet } from "./api.js?v=0004";
+} from "./render.js?v=0006";
+import { fetchCarnet } from "./api.js?v=0006";
 
 const carnetCard = document.getElementById("carnet-card");
 const carnetContent = document.getElementById("carnet-content");
@@ -132,4 +133,7 @@ document.addEventListener("keydown", function (event) {
 
 configurePdfLinks();
 renderInfoMessages(infoList, INFO_MESSAGES);
-loadCarnet();
+
+if (!CONFIG_PENDING_REDIRECT) {
+  loadCarnet();
+}
