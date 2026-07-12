@@ -1,4 +1,4 @@
-import { CONFIG } from "./config.js?v=0004";
+import { CONFIG } from "./config.js?v=0006";
 
 function buildCarnetUrl() {
   const baseUrl = CONFIG.API_URL.trim();
@@ -8,61 +8,17 @@ function buildCarnetUrl() {
   return baseUrl + separator + "uuid=" + encodedUuid;
 }
 
-function fetchCarnetJsonp(url, signal) {
-  return new Promise(function (resolve, reject) {
-    if (signal && signal.aborted) {
-      reject(new DOMException("Aborted", "AbortError"));
-      return;
-    }
-
-    const callbackName =
-      "carnetCb_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
-    const script = document.createElement("script");
-    const separator = url.includes("?") ? "&" : "?";
-
-    script.src = url + separator + "callback=" + encodeURIComponent(callbackName);
-    script.async = true;
-
-    function cleanup() {
-      delete window[callbackName];
-
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-
-      if (signal) {
-        signal.removeEventListener("abort", onAbort);
-      }
-    }
-
-    function onAbort() {
-      cleanup();
-      reject(new DOMException("Aborted", "AbortError"));
-    }
-
-    window[callbackName] = function (data) {
-      cleanup();
-      resolve(data);
-    };
-
-    script.onerror = function () {
-      cleanup();
-      reject(new Error(
-        "No se pudo contactar con el script del carnet. " +
-          "Compruebe que el script está publicado con soporte JSONP y que la URL termina en /exec (sin TinyURL)."
-      ));
-    };
-
-    if (signal) {
-      signal.addEventListener("abort", onAbort);
-    }
-
-    document.head.appendChild(script);
-  });
-}
-
 export async function fetchCarnet(signal) {
-  const data = await fetchCarnetJsonp(buildCarnetUrl(), signal);
+  const response = await fetch(buildCarnetUrl(), {
+    signal: signal,
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Error HTTP " + response.status + ": " + response.statusText);
+  }
+
+  const data = await response.json();
 
   if (!data || typeof data !== "object") {
     throw new Error("La respuesta del carnet no es válida");
