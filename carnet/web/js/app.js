@@ -1,18 +1,18 @@
-import { fetchCarnet } from "./api.js?v=0002";
+import { fetchCarnet } from "./api.js?v=0003";
 import {
   CERTIFIED_PDF_FILENAME,
   CERTIFIED_PDF_URL,
   CONFIG,
   CONFIG_ERROR,
   INFO_MESSAGES,
-} from "./config.js?v=0002";
+} from "./config.js?v=0003";
 import {
   buildCarnetFields,
   renderCarnetCard,
   renderInfoMessages,
   setStatusMessage,
-} from "./render.js?v=0002";
-import { APP_VERSION } from "./version.js?v=0002";
+} from "./render.js?v=0003";
+import { APP_VERSION } from "./version.js?v=0003";
 
 const carnetCard = document.getElementById("carnet-card");
 const carnetContent = document.getElementById("carnet-content");
@@ -25,6 +25,7 @@ const pdfFrame = document.getElementById("pdf-frame");
 const pdfDownloadLink = document.getElementById("pdf-download-link");
 const pdfOpenLink = document.getElementById("pdf-open-link");
 const infoList = document.getElementById("info-list");
+const appVersion = document.getElementById("app-version");
 
 let activeController = null;
 let openModalId = null;
@@ -133,4 +134,9 @@ document.addEventListener("keydown", function (event) {
 
 configurePdfLinks();
 renderInfoMessages(infoList, INFO_MESSAGES);
+
+if (appVersion) {
+  appVersion.textContent = "v" + APP_VERSION;
+}
+
 loadCarnet();
