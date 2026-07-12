@@ -1,17 +1,18 @@
-import { fetchCarnet } from "./api.js";
+import { fetchCarnet } from "./api.js?v=0002";
 import {
   CERTIFIED_PDF_FILENAME,
   CERTIFIED_PDF_URL,
   CONFIG,
   CONFIG_ERROR,
   INFO_MESSAGES,
-} from "./config.js";
+} from "./config.js?v=0002";
 import {
   buildCarnetFields,
   renderCarnetCard,
   renderInfoMessages,
   setStatusMessage,
-} from "./render.js";
+} from "./render.js?v=0002";
+import { APP_VERSION } from "./version.js?v=0002";
 
 const carnetCard = document.getElementById("carnet-card");
 const carnetContent = document.getElementById("carnet-content");
