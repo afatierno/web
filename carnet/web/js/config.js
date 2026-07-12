@@ -14,33 +14,61 @@ export const CERTIFIED_PDF_FILENAME = "carnet-certificado.pdf";
 
 export const CONTACT_EMAIL = "ampa.etierno@gmail.com";
 export const OFFICIAL_SITE_URL = "https://afatierno.github.io/web/";
+export const OFFICIAL_DOMAIN_URL = "https://afatierno.github.io/";
+export const VALIDATION_PAGE_URL = "https://afatierno.github.io/web/carnet/web/validacion.html";
 
 export const INFO_MESSAGES = [
   [
-    { type: "text", value: "Este carnet pertenece a la unidad familiar y no es transferible." },
+    {
+      type: "text",
+      value: "Este carné pertenece a la unidad familiar y no es transferible.",
+    },
   ],
   [
     {
       type: "text",
       value:
-        "Si has compartido el carnet con otra persona ajena o crees que alguien lo posee, escríbenos un correo a ",
-    },
-    { type: "link", href: "mailto:" + CONTACT_EMAIL, label: CONTACT_EMAIL },
-    {
-      type: "text",
-      value: " para que podamos desactivar el viejo y generemos uno nuevo.",
+        "El acceso se realiza exclusivamente mediante un enlace personal. No compartas ese enlace ni el carné fuera de tu familia: quien lo tenga podrá identificarse como parte de ella.",
     },
   ],
   [
     {
       type: "text",
-      value: "Estos carnets solo son válidos si el dominio desde donde se ve es ",
+      value:
+        "Si has compartido el enlace por error, lo has perdido o crees que alguien ajeno lo posee, escríbenos a ",
     },
-    { type: "link", href: OFFICIAL_SITE_URL, label: OFFICIAL_SITE_URL },
+    { type: "link", href: "mailto:" + CONTACT_EMAIL, label: CONTACT_EMAIL },
     {
       type: "text",
-      value: " Cualquier otra dirección es una falsificación y, por lo tanto, no tiene validez.",
+      value: " para desactivarlo y generar uno nuevo.",
     },
+  ],
+  [
+    {
+      type: "text",
+      value: "Este carné solo es válido si se visualiza desde ",
+    },
+    { type: "link", href: OFFICIAL_DOMAIN_URL, label: OFFICIAL_DOMAIN_URL },
+    {
+      type: "text",
+      value: " Cualquier otra dirección es una falsificación sin validez.",
+    },
+  ],
+  [
+    {
+      type: "text",
+      value:
+        "El AFA no se hace responsable del uso indebido del carné si no se ha notificado su pérdida o cesión no autorizada.",
+    },
+  ],
+  [
+    {
+      type: "text",
+      value:
+        "Los datos personales mostrados en este carné son tratados por el AFA Enrique Tierno Galván de Getafe para identificar a los socios. Puedes ejercer tus derechos de acceso, rectificación o supresión escribiendo a ",
+    },
+    { type: "link", href: "mailto:" + CONTACT_EMAIL, label: CONTACT_EMAIL },
+    { type: "text", value: "." },
   ],
 ];
 
