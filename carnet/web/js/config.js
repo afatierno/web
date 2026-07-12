@@ -17,6 +17,8 @@ export const OFFICIAL_SITE_URL = "https://afatierno.github.io/web/";
 export const OFFICIAL_DOMAIN_URL = "https://afatierno.github.io/";
 export const VALIDATION_PAGE_URL = "https://afatierno.github.io/web/carnet/web/validacion.html";
 
+export const CARNET_VALIDITY_TEXT = "De septiembre de 2026 a agosto de 2027";
+
 export const INFO_MESSAGES = [
   [
     {

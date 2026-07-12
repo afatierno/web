@@ -1,17 +1,18 @@
 import {
+  CARNET_VALIDITY_TEXT,
   CONFIG,
   CONFIG_ERROR,
   CONFIG_PENDING_REDIRECT,
   INFO_MESSAGES,
-} from "./config.js?v=0012";
+} from "./config.js?v=0014";
 import {
   buildCarnetFields,
   renderCarnetCard,
   renderInfoMessages,
   setStatusMessage,
-} from "./render.js?v=0012";
-import { fetchCarnet } from "./api.js?v=0012";
-import { buildValidationAccessUrl, renderQrCode } from "./qr.js?v=0012";
+} from "./render.js?v=0014";
+import { fetchCarnet } from "./api.js?v=0014";
+import { buildValidationAccessUrl, renderQrCode } from "./qr.js?v=0014";
 
 const UUID_V4_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -20,6 +21,7 @@ const carnetCard = document.getElementById("carnet-card");
 const carnetContent = document.getElementById("carnet-content");
 const validationQrSection = document.getElementById("validation-qr-section");
 const validationQr = document.getElementById("validation-qr");
+const validationQrValidity = document.getElementById("validation-qr-validity");
 const statusMessage = document.getElementById("status-message");
 const infoButton = document.getElementById("info-button");
 const infoModal = document.getElementById("info-modal");
@@ -71,10 +73,12 @@ function showCarnet(data) {
   if (validationToken && UUID_V4_REGEX.test(validationToken) && CONFIG) {
     const validationUrl = buildValidationAccessUrl(validationToken, CONFIG.API_URL);
     renderQrCode(validationQr, validationUrl);
+    validationQrValidity.textContent = CARNET_VALIDITY_TEXT;
     validationQrSection.hidden = false;
   } else {
     validationQrSection.hidden = true;
     validationQr.replaceChildren();
+    validationQrValidity.textContent = "";
   }
 }
 
