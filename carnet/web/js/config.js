@@ -9,7 +9,7 @@ export const CERTIFIED_PDF_URL = "assets/pdf/carnet-certificado.pdf";
 export const CERTIFIED_PDF_FILENAME = "carnet-certificado.pdf";
 
 export const CONTACT_EMAIL = "ampa.etierno@gmail.com";
-export const OFFICIAL_SITE_URL = "https://afatierno.github.io/";
+export const OFFICIAL_SITE_URL = "https://afatierno.github.io/web/";
 
 export const INFO_MESSAGES = [
   [
@@ -63,8 +63,16 @@ function loadEncodedConfig() {
   const fromUrl = params.get(CONFIG_PARAM);
 
   if (fromUrl) {
-    sessionStorage.setItem(SESSION_KEY, fromUrl);
     stripConfigFromUrl();
+
+    const parsedFromUrl = parseEncodedConfig(fromUrl);
+
+    if (parsedFromUrl.error) {
+      sessionStorage.removeItem(SESSION_KEY);
+      return fromUrl;
+    }
+
+    sessionStorage.setItem(SESSION_KEY, fromUrl);
     return fromUrl;
   }
 

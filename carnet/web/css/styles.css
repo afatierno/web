@@ -59,6 +59,14 @@ body.modal-open {
   line-height: 1.2;
 }
 
+.app-version {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+}
+
 .text-link {
   color: var(--accent);
   text-decoration: underline;
