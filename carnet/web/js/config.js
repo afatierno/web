@@ -4,6 +4,9 @@ const UUID_V4_REGEX =
 const CONFIG_PARAM = "c";
 const SESSION_KEY = "afa.carnet.access";
 
+/** Incrementar en cada cambio (vXXXX). Mantener igual que en index.html. */
+export const APP_VERSION = "0004";
+
 /** PDF certificado firmado (ruta fija en el sitio). */
 export const CERTIFIED_PDF_URL = "assets/pdf/carnet-certificado.pdf";
 export const CERTIFIED_PDF_FILENAME = "carnet-certificado.pdf";
@@ -119,6 +122,14 @@ function parseEncodedConfig(encoded) {
     return { error: "La URL del script no es válida" };
   }
 
+  if (isShortenerApiUrl_(apiUrl)) {
+    return {
+      error:
+        "La URL del script no puede ser un acortador (TinyURL, bit.ly, etc.). " +
+        "En config use la URL directa de Apps Script que termina en /exec",
+    };
+  }
+
   return {
     config: {
       UUID: uuid,
@@ -138,4 +149,21 @@ export function encodeAccessConfig(uuid, apiUrl) {
 
 export function clearAccessSession() {
   sessionStorage.removeItem(SESSION_KEY);
+}
+
+function isShortenerApiUrl_(url) {
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+
+    return (
+      host === "tinyurl.com" ||
+      host.endsWith(".tinyurl.com") ||
+      host === "bit.ly" ||
+      host === "t.co" ||
+      host === "goo.gl" ||
+      host === "is.gd"
+    );
+  } catch {
+    return false;
+  }
 }

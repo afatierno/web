@@ -1,4 +1,4 @@
-import { CONFIG } from "./config.js?v=0003";
+import { CONFIG } from "./config.js?v=0004";
 
 function buildCarnetUrl() {
   const baseUrl = CONFIG.API_URL.trim();
@@ -47,7 +47,10 @@ function fetchCarnetJsonp(url, signal) {
 
     script.onerror = function () {
       cleanup();
-      reject(new Error("No se pudo contactar con el script del carnet"));
+      reject(new Error(
+        "No se pudo contactar con el script del carnet. " +
+          "Compruebe que el script está publicado con soporte JSONP y que la URL termina en /exec (sin TinyURL)."
+      ));
     };
 
     if (signal) {
