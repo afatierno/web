@@ -1,4 +1,4 @@
-import { CONFIG } from "./config.js?v=0006";
+import { CONFIG } from "./config.js?v=0009";
 
 function buildCarnetUrl() {
   const baseUrl = CONFIG.API_URL.trim();
