@@ -1,7 +1,14 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   font-size: 16px;
+  overflow-x: clip;
 }
 
 body {
@@ -11,6 +18,8 @@ body {
   padding: 0 20px;
   line-height: 1.4;
   font-size: 1.0625rem;
+  width: 100%;
+  overflow-x: clip;
 }
 
 h1 {
@@ -32,6 +41,15 @@ h1 {
 
 .panel {
   margin-bottom: 16px;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.search-row,
+#results-wrap,
+.table-scroll {
+  max-width: 100%;
+  min-width: 0;
 }
 
 label {
@@ -124,12 +142,7 @@ th {
 }
 
 @media only screen and (max-width: 767px) {
-  html {
-    font-size: 18px;
-  }
-
   body {
-    width: 100%;
     max-width: none;
     margin: 0;
     padding:
@@ -137,34 +150,35 @@ th {
       calc(1rem + env(safe-area-inset-right, 0px))
       calc(1.5rem + env(safe-area-inset-bottom, 0px))
       calc(1rem + env(safe-area-inset-left, 0px));
-    line-height: 1.55;
-    font-size: 1.125rem;
+    line-height: 1.5;
+    font-size: 1rem;
   }
 
   h1 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
+    font-size: 1.35rem;
+    margin-bottom: 0.875rem;
   }
 
   label,
   p,
   #status {
-    font-size: 1.0625rem;
+    font-size: 1rem;
   }
 
   input[type="search"] {
-    font-size: 1.125rem !important;
-    padding: 12px 14px;
-    min-height: 3.25rem;
+    font-size: 1rem;
+    padding: 10px 12px;
+    min-height: 2.75rem;
+    max-width: 100%;
   }
 
   button {
     display: block;
     width: 100%;
     margin-right: 0;
-    font-size: 1.125rem;
-    padding: 12px 16px;
-    min-height: 3.25rem;
+    font-size: 1rem;
+    padding: 10px 16px;
+    min-height: 2.75rem;
   }
 
   .search-row {
@@ -185,12 +199,12 @@ th {
 
   th,
   td {
-    padding: 10px 12px;
-    font-size: 1rem;
+    padding: 8px 10px;
+    font-size: 0.9375rem;
   }
 
   .table-scroll {
-    margin-left: -0.25rem;
-    margin-right: -0.25rem;
+    margin-left: 0;
+    margin-right: 0;
   }
 }
