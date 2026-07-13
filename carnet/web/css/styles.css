@@ -9,6 +9,12 @@
   --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
+  --carnet-label-size: clamp(0.9375rem, 0.84rem + 0.55vw, 1.0625rem);
+  --carnet-value-size: clamp(1.3125rem, 1.05rem + 1.35vw, 1.5rem);
+  --carnet-primary-size: clamp(1.5625rem, 1.2rem + 2.1vw, 1.9375rem);
+  --carnet-support-size: clamp(0.9375rem, 0.86rem + 0.45vw, 1.0625rem);
+  --carnet-field-padding-y: clamp(18px, 14px + 1.25vw, 24px);
+  --carnet-field-padding-x: clamp(18px, 14px + 1vw, 24px);
 }
 
 * {
@@ -55,7 +61,7 @@ body.modal-open {
 
 .page-header h1 {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: clamp(1.65rem, 1.35rem + 1.6vw, 1.85rem);
   line-height: 1.2;
 }
 
@@ -118,7 +124,7 @@ body.modal-open {
 }
 
 .carnet-field {
-  padding: 16px 18px;
+  padding: var(--carnet-field-padding-y) var(--carnet-field-padding-x);
   border-top: 1px solid rgba(229, 231, 235, 0.9);
   background: rgba(255, 255, 255, 0.68);
   backdrop-filter: blur(2px);
@@ -133,9 +139,9 @@ body.modal-open {
 }
 
 .carnet-field dt {
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   color: var(--muted);
-  font-size: 0.82rem;
+  font-size: var(--carnet-label-size);
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -143,7 +149,7 @@ body.modal-open {
 
 .carnet-field dd {
   margin: 0;
-  font-size: 1.08rem;
+  font-size: var(--carnet-value-size);
   font-weight: 600;
   line-height: 1.35;
   word-break: break-word;
@@ -151,14 +157,15 @@ body.modal-open {
 }
 
 .carnet-field-primary dd {
-  font-size: 1.35rem;
+  font-size: var(--carnet-primary-size);
   letter-spacing: 0.04em;
 }
 
 .carnet-empty {
   margin: 0;
-  padding: 20px 18px;
+  padding: var(--carnet-field-padding-y) var(--carnet-field-padding-x);
   color: var(--muted);
+  font-size: var(--carnet-support-size);
   background: rgba(255, 255, 255, 0.68);
 }
 
@@ -382,13 +389,13 @@ body.modal-open {
 
 .validation-qr-title {
   margin: 0 0 6px;
-  font-size: 1rem;
+  font-size: clamp(1.0625rem, 0.95rem + 0.65vw, 1.1875rem);
 }
 
 .validation-qr-intro {
   margin: 0 0 14px;
   color: var(--muted);
-  font-size: 0.92rem;
+  font-size: var(--carnet-support-size);
 }
 
 .validation-qr {
@@ -409,18 +416,18 @@ body.modal-open {
 .validation-qr-validity {
   margin: 12px 0 0;
   color: var(--muted);
-  font-size: 0.78rem;
-  line-height: 1.4;
+  font-size: var(--carnet-support-size);
+  line-height: 1.45;
 }
 
 .carnet-id-reminder {
   position: relative;
   z-index: 1;
   margin: 0;
-  padding: 14px 18px 18px;
+  padding: var(--carnet-field-padding-y) var(--carnet-field-padding-x);
   color: var(--muted);
-  font-size: 0.85rem;
-  line-height: 1.45;
+  font-size: var(--carnet-support-size);
+  line-height: 1.5;
   text-align: center;
   border-top: 1px solid rgba(229, 231, 235, 0.9);
   background: rgba(249, 250, 251, 0.75);
