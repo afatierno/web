@@ -1,4 +1,4 @@
-import { CONFIG, CONFIG_ERROR } from "./config.js";
+import { CONFIG, CONFIG_ERROR, CONFIG_PENDING_REDIRECT } from "./config.js?v=0002";
 import { fetchSearch } from "./api.js";
 import { createResultsRenderer } from "./render.js";
 
@@ -183,6 +183,10 @@ function showConfigError(message) {
 }
 
 function init() {
+  if (CONFIG_PENDING_REDIRECT) {
+    return;
+  }
+
   if (CONFIG_ERROR || !CONFIG) {
     showConfigError(CONFIG_ERROR || "Configuración de acceso no válida");
     return;

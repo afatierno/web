@@ -10,6 +10,10 @@ const SEARCH_SETTINGS = {
 const CONFIG_PARAM = "c";
 const SESSION_KEY = "afa.access";
 
+/** Si hay ?c= en la URL, guardamos y recargamos sin ese parámetro (fuerza HTML/CSS/JS nuevos). */
+let bootstrapConfigError_ = null;
+const CONFIG_PENDING_REDIRECT = bootstrapAccessConfig_();
+
 function decodeBase64(value) {
   const normalized = String(value || "")
     .replace(/-/g, "+")
@@ -20,24 +24,43 @@ function decodeBase64(value) {
 }
 
 function stripConfigFromUrl() {
-  if (!window.location.search.includes(`${CONFIG_PARAM}=`)) {
+  if (!window.location.search.includes(CONFIG_PARAM + "=")) {
     return;
   }
 
-  const cleanUrl = `${window.location.pathname}${window.location.hash}`;
+  const cleanUrl = window.location.pathname + window.location.hash;
   history.replaceState(null, document.title, cleanUrl);
 }
 
-function loadEncodedConfig() {
+function bootstrapAccessConfig_() {
   const params = new URLSearchParams(window.location.search);
   const fromUrl = params.get(CONFIG_PARAM);
 
-  if (fromUrl) {
-    sessionStorage.setItem(SESSION_KEY, fromUrl);
-    stripConfigFromUrl();
-    return fromUrl;
+  if (!fromUrl) {
+    return false;
   }
 
+  const parsedFromUrl = parseEncodedConfig(fromUrl);
+
+  if (parsedFromUrl.error) {
+    sessionStorage.removeItem(SESSION_KEY);
+    bootstrapConfigError_ = parsedFromUrl.error;
+    stripConfigFromUrl();
+    return false;
+  }
+
+  sessionStorage.setItem(SESSION_KEY, fromUrl);
+
+  if (window.location.search) {
+    const cleanUrl = window.location.pathname + window.location.hash;
+    window.location.replace(cleanUrl);
+    return true;
+  }
+
+  return false;
+}
+
+function loadEncodedConfig() {
   return sessionStorage.getItem(SESSION_KEY);
 }
 
@@ -90,13 +113,18 @@ function parseEncodedConfig(encoded) {
   };
 }
 
-const parsed = parseEncodedConfig(loadEncodedConfig());
+const parsed = CONFIG_PENDING_REDIRECT
+  ? { config: null, error: null }
+  : bootstrapConfigError_
+    ? { error: bootstrapConfigError_ }
+    : parseEncodedConfig(loadEncodedConfig());
 
+export { CONFIG_PENDING_REDIRECT };
 export const CONFIG_ERROR = parsed.error || null;
 export const CONFIG = parsed.config || null;
 
 export function encodeAccessConfig(uuid, apiUrl) {
-  return btoa(`${uuid}|${apiUrl}`);
+  return btoa(uuid + "|" + apiUrl);
 }
 
 export function clearAccessSession() {
