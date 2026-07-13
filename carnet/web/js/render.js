@@ -65,6 +65,98 @@ export function renderCarnetCard(container, fields) {
   });
 
   container.appendChild(list);
+
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      fitCarnetTypography_(container);
+    });
+  });
+}
+
+let carnetTypographyObserver_ = null;
+
+function fitCarnetTypography_(container) {
+  const fitAll = function () {
+    container.querySelectorAll(".carnet-field dd").forEach(function (definition) {
+      fitCarnetValue_(definition, definition.closest(".carnet-field-primary") !== null);
+    });
+  };
+
+  fitAll();
+
+  if (typeof ResizeObserver === "undefined") {
+    return;
+  }
+
+  if (carnetTypographyObserver_) {
+    carnetTypographyObserver_.disconnect();
+  }
+
+  carnetTypographyObserver_ = new ResizeObserver(function () {
+    fitAll();
+  });
+  carnetTypographyObserver_.observe(container);
+}
+
+function getCarnetFieldContentWidth_(fieldElement) {
+  const styles = getComputedStyle(fieldElement);
+
+  return (
+    fieldElement.clientWidth -
+    parseFloat(styles.paddingLeft) -
+    parseFloat(styles.paddingRight)
+  );
+}
+
+function fitCarnetValue_(element, isPrimary) {
+  const field = element.closest(".carnet-field");
+
+  if (!field) {
+    return;
+  }
+
+  const maxWidth = getCarnetFieldContentWidth_(field);
+
+  if (maxWidth <= 0) {
+    return;
+  }
+
+  const maxPx = isPrimary ? 46 : 38;
+  const minPx = isPrimary ? 20 : 18;
+
+  element.style.width = "100%";
+  element.style.whiteSpace = "nowrap";
+
+  let bestSize = minPx;
+
+  for (let size = minPx; size <= maxPx; size += 0.5) {
+    element.style.fontSize = size + "px";
+
+    if (element.scrollWidth <= maxWidth) {
+      bestSize = size;
+      continue;
+    }
+
+    break;
+  }
+
+  element.style.fontSize = bestSize + "px";
+
+  if (element.scrollWidth <= maxWidth) {
+    return;
+  }
+
+  element.style.whiteSpace = "normal";
+
+  for (let size = maxPx; size >= minPx; size -= 0.5) {
+    element.style.fontSize = size + "px";
+
+    if (element.scrollWidth <= maxWidth) {
+      return;
+    }
+  }
+
+  element.style.fontSize = minPx + "px";
 }
 
 export function renderInfoMessages(listElement, messages) {
