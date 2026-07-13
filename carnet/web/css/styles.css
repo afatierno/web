@@ -9,12 +9,13 @@
   --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
-  --carnet-label-size: clamp(0.9375rem, 0.84rem + 0.55vw, 1.0625rem);
-  --carnet-value-size: clamp(1.3125rem, 1.05rem + 1.35vw, 1.5rem);
-  --carnet-primary-size: clamp(1.5625rem, 1.2rem + 2.1vw, 1.9375rem);
-  --carnet-support-size: clamp(0.9375rem, 0.86rem + 0.45vw, 1.0625rem);
+  --carnet-label-size: clamp(1rem, 0.9rem + 0.65vw, 1.125rem);
+  --carnet-value-size: clamp(1.375rem, 1.1rem + 1.6vw, 1.625rem);
+  --carnet-primary-size: clamp(1.625rem, 1.25rem + 2.4vw, 2rem);
+  --carnet-support-size: clamp(1rem, 0.92rem + 0.5vw, 1.125rem);
   --carnet-field-padding-y: clamp(18px, 14px + 1.25vw, 24px);
-  --carnet-field-padding-x: clamp(18px, 14px + 1vw, 24px);
+  --carnet-field-padding-x: clamp(14px, 10px + 1.2vw, 22px);
+  --page-padding-x: clamp(12px, 3vw, 20px);
 }
 
 * {
@@ -41,10 +42,10 @@ body.modal-open {
 
 .page {
   min-height: 100vh;
-  padding:
-    calc(20px + var(--safe-top))
-    20px
-    calc(96px + var(--safe-bottom));
+  padding-top: calc(20px + var(--safe-top));
+  padding-bottom: calc(96px + var(--safe-bottom));
+  padding-left: calc(var(--page-padding-x) + env(safe-area-inset-left, 0px));
+  padding-right: calc(var(--page-padding-x) + env(safe-area-inset-right, 0px));
 }
 
 .page-header {
@@ -156,16 +157,19 @@ body.modal-open {
 
 .carnet-field dd {
   margin: 0;
+  width: 100%;
+  max-width: 100%;
   font-size: var(--carnet-value-size);
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.25;
   word-break: break-word;
+  overflow-wrap: anywhere;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
 }
 
 .carnet-field-primary dd {
   font-size: var(--carnet-primary-size);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
 }
 
 .carnet-empty {
