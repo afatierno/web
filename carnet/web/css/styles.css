@@ -59,6 +59,13 @@ body.modal-open {
   text-transform: uppercase;
 }
 
+.page-version {
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+
 .page-header h1 {
   margin: 0;
   font-size: clamp(1.65rem, 1.35rem + 1.6vw, 1.85rem);
