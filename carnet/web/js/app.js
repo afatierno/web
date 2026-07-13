@@ -7,10 +7,11 @@ import {
 } from "./config.js";
 import {
   buildCarnetFields,
+  refitCarnetTypography,
   renderCarnetCard,
   renderInfoMessages,
   setStatusMessage,
-} from "./render.js";
+} from "./render.js?v=0003";
 import { fetchCarnet } from "./api.js";
 import { buildValidationAccessUrl, renderQrCode } from "./qr.js";
 
@@ -63,10 +64,12 @@ function showError(message) {
 function showCarnet(data) {
   const fields = buildCarnetFields(data.headers || [], data.values || []);
 
-  renderCarnetCard(carnetContent, fields);
   carnetCard.hidden = false;
   statusMessage.textContent = "";
   statusMessage.className = "status-message";
+
+  renderCarnetCard(carnetContent, fields);
+  refitCarnetTypography(carnetContent);
 
   const validationToken = String(data.validationToken || "").trim();
 

@@ -65,15 +65,28 @@ export function renderCarnetCard(container, fields) {
   });
 
   container.appendChild(list);
+  scheduleCarnetTypographyFit_(container);
+}
+
+export function refitCarnetTypography(container) {
+  scheduleCarnetTypographyFit_(container);
+}
+
+function scheduleCarnetTypographyFit_(container) {
+  const runFit = function () {
+    fitCarnetTypography_(container);
+  };
 
   requestAnimationFrame(function () {
-    requestAnimationFrame(function () {
-      fitCarnetTypography_(container);
-    });
+    requestAnimationFrame(runFit);
   });
+
+  window.setTimeout(runFit, 120);
+  window.setTimeout(runFit, 400);
 }
 
 let carnetTypographyObserver_ = null;
+let carnetViewportFitAttached_ = false;
 
 function fitCarnetTypography_(container) {
   const fitAll = function () {
@@ -85,6 +98,7 @@ function fitCarnetTypography_(container) {
   fitAll();
 
   if (typeof ResizeObserver === "undefined") {
+    attachCarnetViewportFit_(fitAll);
     return;
   }
 
@@ -96,16 +110,69 @@ function fitCarnetTypography_(container) {
     fitAll();
   });
   carnetTypographyObserver_.observe(container);
+
+  attachCarnetViewportFit_(fitAll);
+}
+
+function attachCarnetViewportFit_(fitAll) {
+  if (carnetViewportFitAttached_) {
+    return;
+  }
+
+  carnetViewportFitAttached_ = true;
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", fitAll, { passive: true });
+  }
+
+  window.addEventListener("orientationchange", function () {
+    window.setTimeout(fitAll, 150);
+  });
 }
 
 function getCarnetFieldContentWidth_(fieldElement) {
   const styles = getComputedStyle(fieldElement);
+  const padding =
+    parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+  const measured = fieldElement.clientWidth - padding;
 
-  return (
-    fieldElement.clientWidth -
-    parseFloat(styles.paddingLeft) -
-    parseFloat(styles.paddingRight)
-  );
+  if (measured > 0) {
+    return measured;
+  }
+
+  const card = fieldElement.closest(".carnet-card");
+
+  if (card && card.clientWidth > 0) {
+    const cardStyles = getComputedStyle(card);
+    const cardPadding =
+      parseFloat(cardStyles.paddingLeft) + parseFloat(cardStyles.paddingRight);
+
+    return Math.max(0, card.clientWidth - cardPadding - padding);
+  }
+
+  const viewportWidth = window.visualViewport
+    ? window.visualViewport.width
+    : window.innerWidth;
+  const rootStyles = getComputedStyle(document.documentElement);
+  const pagePadding = parseFloat(rootStyles.getPropertyValue("--page-padding-x")) || 12;
+
+  return Math.max(0, viewportWidth - pagePadding * 2 - padding);
+}
+
+function getCarnetFontBounds_(isPrimary) {
+  const isMobileLayout = window.matchMedia("(max-width: 640px)").matches;
+
+  if (isPrimary) {
+    return {
+      maxPx: isMobileLayout ? 56 : 46,
+      minPx: isMobileLayout ? 28 : 20,
+    };
+  }
+
+  return {
+    maxPx: isMobileLayout ? 46 : 38,
+    minPx: isMobileLayout ? 24 : 18,
+  };
 }
 
 function fitCarnetValue_(element, isPrimary) {
@@ -121,8 +188,9 @@ function fitCarnetValue_(element, isPrimary) {
     return;
   }
 
-  const maxPx = isPrimary ? 46 : 38;
-  const minPx = isPrimary ? 20 : 18;
+  const bounds = getCarnetFontBounds_(isPrimary);
+  const maxPx = bounds.maxPx;
+  const minPx = bounds.minPx;
 
   element.style.width = "100%";
   element.style.whiteSpace = "nowrap";
