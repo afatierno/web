@@ -263,7 +263,10 @@ body.modal-open {
   right: 16px;
   bottom: calc(16px + var(--safe-bottom));
   max-height: calc(100vh - 32px - var(--safe-top) - var(--safe-bottom));
+  max-height: calc(100dvh - 32px - var(--safe-top) - var(--safe-bottom));
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   border-radius: 18px;
   background: #fff;
   box-shadow: var(--shadow);
@@ -368,12 +371,26 @@ body.modal-open {
 }
 
 .info-modal-panel {
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  top: calc(16px + var(--safe-top));
+  bottom: calc(16px + var(--safe-bottom));
+  max-height: none;
+  overflow: hidden;
+}
+
+.info-modal-panel .app-modal-header {
+  flex-shrink: 0;
 }
 
 .info-modal-list {
   margin: 0;
   padding: 14px 18px 20px 34px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .info-modal-list li {
