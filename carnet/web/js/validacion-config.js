@@ -7,6 +7,9 @@ const SESSION_KEY = "afa.carnet.validacion.access";
 export const CERTIFIED_PDF_URL = "assets/pdf/carnet-certificado.pdf";
 export const CERTIFIED_PDF_FILENAME = "carnet-certificado.pdf";
 
+/** Visible en la página de validación; súbelo al desplegar cambios. */
+export const APP_VERSION = "v0001";
+
 /** Debe coincidir con QR_DISPLAY_TTL_MS en config.js del carnet. 0 = sin caducidad. */
 export const QR_VALIDATION_TTL_MS = 10 * 1000;
 

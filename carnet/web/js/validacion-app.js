@@ -1,4 +1,5 @@
 import {
+  APP_VERSION,
   CERTIFIED_PDF_FILENAME,
   CERTIFIED_PDF_URL,
   CONFIG,
@@ -12,6 +13,7 @@ const resultCard = document.getElementById("result-card");
 const resultTitle = document.getElementById("result-title");
 const resultBody = document.getElementById("result-body");
 const pdfLink = document.getElementById("pdf-link");
+const appVersion = document.getElementById("app-version");
 
 let activeController = null;
 
@@ -76,6 +78,10 @@ async function loadValidation() {
 }
 
 configurePdfLink();
+
+if (appVersion) {
+  appVersion.textContent = APP_VERSION;
+}
 
 if (!CONFIG_PENDING_REDIRECT) {
   loadValidation();
