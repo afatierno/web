@@ -1,4 +1,4 @@
-import { CONFIG } from "./validacion-config.js?v=0008";
+import { CONFIG } from "./validacion-config.js?v=0009";
 
 function buildValidateUrl() {
   const baseUrl = CONFIG.API_URL.trim();
