@@ -8,10 +8,7 @@ export const CERTIFIED_PDF_URL = "assets/pdf/carnet-certificado.pdf";
 export const CERTIFIED_PDF_FILENAME = "carnet-certificado.pdf";
 
 /** Visible en la página de validación; súbelo al desplegar cambios. */
-export const APP_VERSION = "v0002";
-
-/** Debe coincidir con QR_DISPLAY_TTL_MS en config.js del carnet. 0 = sin caducidad. */
-export const QR_VALIDATION_TTL_MS = 10 * 1000;
+export const APP_VERSION = "v0003";
 
 let bootstrapConfigError_ = null;
 const CONFIG_PENDING_REDIRECT = bootstrapAccessConfig_();
@@ -118,14 +115,6 @@ function parseEncodedConfig(encoded) {
     new URL(apiUrl);
   } catch {
     return { error: "La URL del script no es válida" };
-  }
-
-  if (
-    issuedAt != null &&
-    QR_VALIDATION_TTL_MS > 0 &&
-    Date.now() - issuedAt > QR_VALIDATION_TTL_MS
-  ) {
-    return { error: "El código QR ha caducado. Pide que renueven el carnet." };
   }
 
   return {
