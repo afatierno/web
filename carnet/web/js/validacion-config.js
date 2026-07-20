@@ -7,9 +7,6 @@ const SESSION_KEY = "afa.carnet.validacion.access";
 export const CERTIFIED_PDF_URL = "assets/pdf/carnet-certificado.pdf";
 export const CERTIFIED_PDF_FILENAME = "carnet-certificado.pdf";
 
-/** Visible en la página de validación; súbelo al desplegar cambios. */
-export const APP_VERSION = "v0003";
-
 let bootstrapConfigError_ = null;
 const CONFIG_PENDING_REDIRECT = bootstrapAccessConfig_();
 

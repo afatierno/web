@@ -20,8 +20,11 @@ export const VALIDATION_PAGE_URL = "https://afatierno.github.io/web/carnet/web/v
 
 export const CARNET_VALIDITY_TEXT = "Periodo de Validez: septiembre de 2026 a agosto de 2027";
 
-/** Tiempo visible del QR antes de caducar (prueba: 10 s). Pon 0 para desactivar caducidad. */
-export const QR_DISPLAY_TTL_MS = 10 * 1000;
+/** Tiempo en pantalla antes de pedir renovar el QR. Pon 0 para desactivar. */
+export const QR_DISPLAY_TTL_MS = 2 * 60 * 1000;
+
+/** Validez al escanear (referencia; la comprueba el GS). */
+export const QR_VALIDATION_TTL_MS = 4 * 60 * 1000;
 
 export const QR_RELOAD_LABEL = "Pulsa";
 export const QR_RELOAD_ICON_URL = "assets/images/reload-icon.png";
