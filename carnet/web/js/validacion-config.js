@@ -75,26 +75,19 @@ function parseEncodedConfig(encoded) {
 
   const parts = decoded.split("|");
 
-  if (parts.length < 2) {
-    return { error: "El enlace de validación tiene un formato inválido" };
+  if (parts.length < 3) {
+    return { error: "El enlace de validación tiene un formato inválido (se requiere timestamp)" };
   }
 
   const uuid = parts[0].trim();
-  let issuedAt = null;
-  let apiUrl;
+  const timestampPart = parts[1].trim();
+  const apiUrl = parts.slice(2).join("|").trim();
 
-  if (parts.length === 2) {
-    apiUrl = parts[1].trim();
-  } else {
-    const timestampPart = parts[1].trim();
-    apiUrl = parts.slice(2).join("|").trim();
-
-    if (!/^\d+$/.test(timestampPart)) {
-      return { error: "El enlace de validación tiene un timestamp inválido" };
-    }
-
-    issuedAt = Number(timestampPart);
+  if (!/^\d+$/.test(timestampPart)) {
+    return { error: "El enlace de validación tiene un timestamp inválido" };
   }
+
+  const issuedAt = Number(timestampPart);
 
   if (!uuid) {
     return { error: "Falta el token de validación en el enlace" };
