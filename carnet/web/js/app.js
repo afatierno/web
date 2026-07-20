@@ -4,6 +4,9 @@ import {
   CONFIG_ERROR,
   CONFIG_PENDING_REDIRECT,
   INFO_MESSAGES,
+  QR_DISPLAY_TTL_MS,
+  QR_RELOAD_ICON_URL,
+  QR_RELOAD_LABEL,
 } from "./config.js";
 import {
   buildCarnetFields,
@@ -13,7 +16,7 @@ import {
   setStatusMessage,
 } from "./render.js?v=0003";
 import { fetchCarnet } from "./api.js";
-import { buildValidationAccessUrl, renderQrCode } from "./qr.js";
+import { buildValidationAccessUrl, clearValidationQrTimer, setupValidationQr } from "./qr.js";
 
 const UUID_V4_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -52,11 +55,13 @@ function closeModal() {
 }
 
 function showLoading() {
+  clearValidationQrTimer();
   carnetCard.hidden = true;
   setStatusMessage(statusMessage, "Cargando carnet…", "loading");
 }
 
 function showError(message) {
+  clearValidationQrTimer();
   carnetCard.hidden = true;
   setStatusMessage(statusMessage, message, "error");
 }
@@ -74,11 +79,18 @@ function showCarnet(data) {
   const validationToken = String(data.validationToken || "").trim();
 
   if (validationToken && UUID_V4_REGEX.test(validationToken) && CONFIG) {
-    const validationUrl = buildValidationAccessUrl(validationToken, CONFIG.API_URL);
-    renderQrCode(validationQr, validationUrl);
-    validationQrValidity.textContent = CARNET_VALIDITY_TEXT;
+    setupValidationQr(validationQr, validationQrValidity, {
+      getValidationUrl: function () {
+        return buildValidationAccessUrl(validationToken, CONFIG.API_URL);
+      },
+      ttlMs: QR_DISPLAY_TTL_MS,
+      validityText: CARNET_VALIDITY_TEXT,
+      reloadLabel: QR_RELOAD_LABEL,
+      reloadIconUrl: QR_RELOAD_ICON_URL,
+    });
     validationQrSection.hidden = false;
   } else {
+    clearValidationQrTimer();
     validationQrSection.hidden = true;
     validationQr.replaceChildren();
     validationQrValidity.textContent = "";

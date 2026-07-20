@@ -5,7 +5,13 @@ function buildValidateUrl() {
   const encodedUuid = encodeURIComponent(CONFIG.UUID);
   const separator = baseUrl.includes("?") ? "&" : "?";
 
-  return baseUrl + separator + "uuid=" + encodedUuid + "&fn=validateCarnet";
+  let url = baseUrl + separator + "uuid=" + encodedUuid + "&fn=validateCarnet";
+
+  if (CONFIG.ISSUED_AT != null) {
+    url += "&timestamp=" + encodeURIComponent(String(CONFIG.ISSUED_AT));
+  }
+
+  return url;
 }
 
 export async function fetchValidation(signal) {

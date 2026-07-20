@@ -7,6 +7,9 @@ const SESSION_KEY = "afa.carnet.validacion.access";
 export const CERTIFIED_PDF_URL = "assets/pdf/carnet-certificado.pdf";
 export const CERTIFIED_PDF_FILENAME = "carnet-certificado.pdf";
 
+/** Debe coincidir con QR_DISPLAY_TTL_MS en config.js del carnet. 0 = sin caducidad. */
+export const QR_VALIDATION_TTL_MS = 10 * 1000;
+
 let bootstrapConfigError_ = null;
 const CONFIG_PENDING_REDIRECT = bootstrapAccessConfig_();
 
@@ -73,14 +76,28 @@ function parseEncodedConfig(encoded) {
     return { error: "El enlace de validación no es válido" };
   }
 
-  const separatorIndex = decoded.indexOf("|");
+  const parts = decoded.split("|");
 
-  if (separatorIndex === -1) {
+  if (parts.length < 2) {
     return { error: "El enlace de validación tiene un formato inválido" };
   }
 
-  const uuid = decoded.slice(0, separatorIndex).trim();
-  const apiUrl = decoded.slice(separatorIndex + 1).trim();
+  const uuid = parts[0].trim();
+  let issuedAt = null;
+  let apiUrl;
+
+  if (parts.length === 2) {
+    apiUrl = parts[1].trim();
+  } else {
+    const timestampPart = parts[1].trim();
+    apiUrl = parts.slice(2).join("|").trim();
+
+    if (!/^\d+$/.test(timestampPart)) {
+      return { error: "El enlace de validación tiene un timestamp inválido" };
+    }
+
+    issuedAt = Number(timestampPart);
+  }
 
   if (!uuid) {
     return { error: "Falta el token de validación en el enlace" };
@@ -100,10 +117,19 @@ function parseEncodedConfig(encoded) {
     return { error: "La URL del script no es válida" };
   }
 
+  if (
+    issuedAt != null &&
+    QR_VALIDATION_TTL_MS > 0 &&
+    Date.now() - issuedAt > QR_VALIDATION_TTL_MS
+  ) {
+    return { error: "El código QR ha caducado. Pide que renueven el carnet." };
+  }
+
   return {
     config: {
       UUID: uuid,
       API_URL: apiUrl,
+      ISSUED_AT: issuedAt,
     },
   };
 }
