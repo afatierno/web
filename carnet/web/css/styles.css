@@ -436,6 +436,52 @@ body.modal-open {
 .validation-qr {
   display: flex;
   justify-content: center;
+  align-items: center;
+}
+
+.validation-qr-stage {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.validation-qr-stage.is-expired .validation-qr-code,
+.validation-qr-stage.is-expired .qr-code-image,
+.validation-qr-stage.is-expired .qr-code-image img {
+  opacity: 0.38;
+}
+
+.validation-qr-refresh-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.24);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.validation-qr-refresh-overlay:hover,
+.validation-qr-refresh-overlay:focus-visible {
+  background: rgba(239, 246, 255, 0.34);
+  outline: none;
+}
+
+.validation-qr-refresh-icon {
+  display: block;
+  width: min(88px, 28vw);
+  height: auto;
+  opacity: 0.95;
+}
+
+.validation-qr-refresh-overlay:hover .validation-qr-refresh-icon,
+.validation-qr-refresh-overlay:focus-visible .validation-qr-refresh-icon {
+  opacity: 1;
 }
 
 .qr-code-image img {
