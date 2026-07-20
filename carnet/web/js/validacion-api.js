@@ -1,4 +1,4 @@
-import { CONFIG } from "./validacion-config.js?v=0012";
+import { CONFIG } from "./validacion-config.js?v=0013";
 
 function buildValidateUrl() {
   const baseUrl = CONFIG.API_URL.trim();
@@ -7,9 +7,11 @@ function buildValidateUrl() {
 
   let url = baseUrl + separator + "uuid=" + encodedUuid + "&fn=validateCarnet";
 
-  if (CONFIG.ISSUED_AT != null) {
-    url += "&timestamp=" + encodeURIComponent(String(CONFIG.ISSUED_AT));
+  if (CONFIG.ISSUED_AT == null) {
+    throw new Error("Falta el timestamp en el enlace de validación");
   }
+
+  url += "&timestamp=" + encodeURIComponent(String(CONFIG.ISSUED_AT));
 
   return url;
 }

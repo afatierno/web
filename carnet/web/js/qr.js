@@ -1,4 +1,4 @@
-import { VALIDATION_PAGE_URL } from "./config.js?v=0012";
+import { VALIDATION_PAGE_URL } from "./config.js?v=0013";
 
 /** Requiere qrcode-lib.js cargado antes (global qrcode). */
 export function renderQrCode(container, text) {
@@ -24,12 +24,45 @@ export function buildValidationAccessUrl(validationToken, apiUrl, timestamp) {
 }
 
 let activeQrTimer = null;
+let visibilityHandler = null;
+let currentQrIssuedAt = 0;
 
-export function clearValidationQrTimer() {
+function clearQrTimerOnly_() {
   if (activeQrTimer) {
     clearTimeout(activeQrTimer);
     activeQrTimer = null;
   }
+}
+
+export function clearValidationQrTimer() {
+  clearQrTimerOnly_();
+  unbindVisibilityCheck_();
+  currentQrIssuedAt = 0;
+}
+
+function unbindVisibilityCheck_() {
+  if (!visibilityHandler) {
+    return;
+  }
+
+  document.removeEventListener("visibilitychange", visibilityHandler);
+  window.removeEventListener("pageshow", visibilityHandler);
+  visibilityHandler = null;
+}
+
+function bindVisibilityCheck_(checkFn) {
+  unbindVisibilityCheck_();
+
+  visibilityHandler = function () {
+    if (document.visibilityState && document.visibilityState !== "visible") {
+      return;
+    }
+
+    checkFn();
+  };
+
+  document.addEventListener("visibilitychange", visibilityHandler);
+  window.addEventListener("pageshow", visibilityHandler);
 }
 
 function ensureQrStage(container) {
@@ -60,6 +93,18 @@ function removeQrRefreshOverlay(stage) {
   }
 
   stage.classList.remove("is-expired");
+}
+
+function isQrExpired_(stage, ttlMs) {
+  if (ttlMs <= 0 || !currentQrIssuedAt) {
+    return false;
+  }
+
+  if (stage.classList.contains("is-expired") || stage.querySelector(".validation-qr-refresh-overlay")) {
+    return true;
+  }
+
+  return Date.now() - currentQrIssuedAt >= ttlMs;
 }
 
 function showQrRefreshOverlay(stage, options) {
@@ -105,10 +150,56 @@ export function setupValidationQr(container, validityEl, options) {
     return options.validationUrl || "";
   }
 
+  function showExpiredPrompt() {
+    clearQrTimerOnly_();
+    unbindVisibilityCheck_();
+
+    showQrRefreshOverlay(stage, {
+      reloadLabel: options.reloadLabel,
+      reloadIconUrl: options.reloadIconUrl,
+      onRefresh: function () {
+        showActiveQr();
+      },
+    });
+
+    if (validityEl) {
+      validityEl.textContent =
+        options.expiredText || "El código ha caducado. Pulsa para generar uno nuevo.";
+    }
+  }
+
+  function checkExpiryByClock() {
+    if (isQrExpired_(stage, ttlMs)) {
+      showExpiredPrompt();
+    }
+  }
+
+  function scheduleExpiry() {
+    clearQrTimerOnly_();
+    unbindVisibilityCheck_();
+
+    if (ttlMs <= 0) {
+      return;
+    }
+
+    const remaining = ttlMs - (Date.now() - currentQrIssuedAt);
+
+    if (remaining <= 0) {
+      showExpiredPrompt();
+      return;
+    }
+
+    activeQrTimer = setTimeout(showExpiredPrompt, remaining);
+    bindVisibilityCheck_(checkExpiryByClock);
+  }
+
   function showActiveQr() {
     const validationUrl = resolveValidationUrl();
 
     removeQrRefreshOverlay(stage);
+    clearQrTimerOnly_();
+    unbindVisibilityCheck_();
+    currentQrIssuedAt = Date.now();
 
     if (!validationUrl) {
       qrHost.textContent = "No se pudo generar el código QR.";
@@ -121,34 +212,9 @@ export function setupValidationQr(container, validityEl, options) {
       validityEl.textContent = options.validityText || "";
       validityEl.hidden = false;
     }
-  }
 
-  function showExpiredPrompt() {
-    showQrRefreshOverlay(stage, {
-      reloadLabel: options.reloadLabel,
-      reloadIconUrl: options.reloadIconUrl,
-      onRefresh: function () {
-        showActiveQr();
-        scheduleExpiry();
-      },
-    });
-
-    if (validityEl) {
-      validityEl.textContent =
-        options.expiredText || "El código ha caducado. Pulsa para generar uno nuevo.";
-    }
-  }
-
-  function scheduleExpiry() {
-    clearValidationQrTimer();
-
-    if (ttlMs <= 0) {
-      return;
-    }
-
-    activeQrTimer = setTimeout(showExpiredPrompt, ttlMs);
+    scheduleExpiry();
   }
 
   showActiveQr();
-  scheduleExpiry();
 }

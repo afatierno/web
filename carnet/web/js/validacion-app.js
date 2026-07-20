@@ -4,8 +4,8 @@ import {
   CONFIG,
   CONFIG_ERROR,
   CONFIG_PENDING_REDIRECT,
-} from "./validacion-config.js?v=0012";
-import { fetchValidation } from "./validacion-api.js?v=0012";
+} from "./validacion-config.js?v=0013";
+import { fetchValidation } from "./validacion-api.js?v=0013";
 
 const statusMessage = document.getElementById("status-message");
 const resultCard = document.getElementById("result-card");

@@ -7,16 +7,16 @@ import {
   QR_DISPLAY_TTL_MS,
   QR_RELOAD_ICON_URL,
   QR_RELOAD_LABEL,
-} from "./config.js?v=0012";
+} from "./config.js?v=0013";
 import {
   buildCarnetFields,
   refitCarnetTypography,
   renderCarnetCard,
   renderInfoMessages,
   setStatusMessage,
-} from "./render.js?v=0012";
-import { fetchCarnet } from "./api.js?v=0012";
-import { buildValidationAccessUrl, clearValidationQrTimer, setupValidationQr } from "./qr.js?v=0012";
+} from "./render.js?v=0013";
+import { fetchCarnet } from "./api.js?v=0013";
+import { buildValidationAccessUrl, clearValidationQrTimer, setupValidationQr } from "./qr.js?v=0013";
 
 const UUID_V4_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
