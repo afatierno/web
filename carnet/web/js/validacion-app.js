@@ -1,19 +1,17 @@
 import {
-  APP_VERSION,
   CERTIFIED_PDF_FILENAME,
   CERTIFIED_PDF_URL,
   CONFIG,
   CONFIG_ERROR,
   CONFIG_PENDING_REDIRECT,
-} from "./validacion-config.js?v=0009";
-import { fetchValidation } from "./validacion-api.js?v=0009";
+} from "./validacion-config.js?v=0012";
+import { fetchValidation } from "./validacion-api.js?v=0012";
 
 const statusMessage = document.getElementById("status-message");
 const resultCard = document.getElementById("result-card");
 const resultTitle = document.getElementById("result-title");
 const resultBody = document.getElementById("result-body");
 const pdfLink = document.getElementById("pdf-link");
-const appVersion = document.getElementById("app-version");
 
 let activeController = null;
 
@@ -78,10 +76,6 @@ async function loadValidation() {
 }
 
 configurePdfLink();
-
-if (appVersion) {
-  appVersion.textContent = APP_VERSION;
-}
 
 if (!CONFIG_PENDING_REDIRECT) {
   loadValidation();
