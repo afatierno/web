@@ -1,4 +1,4 @@
-import { QR_LOGO_URL, VALIDATION_PAGE_URL } from "./config.js?v=0015";
+import { VALIDATION_PAGE_URL } from "./config.js?v=0019";
 
 /** Requiere qrcode-lib.js cargado antes (global qrcode). */
 export function renderQrCode(container, text) {
@@ -20,13 +20,6 @@ export function renderQrCode(container, text) {
   if (qrImg) {
     qrImg.classList.add("qr-code-matrix");
   }
-
-  const logo = document.createElement("img");
-  logo.className = "qr-code-logo";
-  logo.src = QR_LOGO_URL;
-  logo.alt = "";
-  logo.decoding = "async";
-  wrap.appendChild(logo);
 
   container.replaceChildren(wrap);
 }
