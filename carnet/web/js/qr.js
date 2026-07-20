@@ -1,4 +1,4 @@
-import { VALIDATION_PAGE_URL } from "./config.js?v=0013";
+import { QR_LOGO_URL, VALIDATION_PAGE_URL } from "./config.js?v=0015";
 
 /** Requiere qrcode-lib.js cargado antes (global qrcode). */
 export function renderQrCode(container, text) {
@@ -7,13 +7,27 @@ export function renderQrCode(container, text) {
     return;
   }
 
-  const qr = qrcode(0, "M");
+  const qr = qrcode(0, "H");
   qr.addData(text);
   qr.make();
 
   const wrap = document.createElement("div");
   wrap.className = "qr-code-image";
   wrap.innerHTML = qr.createImgTag(5, 2, "Código QR de validación del carnet");
+
+  const qrImg = wrap.querySelector("img");
+
+  if (qrImg) {
+    qrImg.classList.add("qr-code-matrix");
+  }
+
+  const logo = document.createElement("img");
+  logo.className = "qr-code-logo";
+  logo.src = QR_LOGO_URL;
+  logo.alt = "";
+  logo.decoding = "async";
+  wrap.appendChild(logo);
+
   container.replaceChildren(wrap);
 }
 

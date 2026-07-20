@@ -28,6 +28,7 @@ export const QR_VALIDATION_TTL_MS = 4 * 60 * 1000;
 
 export const QR_RELOAD_LABEL = "Pulsa";
 export const QR_RELOAD_ICON_URL = "assets/images/reload-icon.png";
+export const QR_LOGO_URL = "assets/images/LogoAfa.png";
 
 export const INFO_MESSAGES = [
   [
