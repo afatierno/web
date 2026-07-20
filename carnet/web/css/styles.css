@@ -447,8 +447,7 @@ body.modal-open {
 
 .validation-qr-stage.is-expired .validation-qr-code,
 .validation-qr-stage.is-expired .qr-code-image,
-.validation-qr-stage.is-expired .qr-code-matrix,
-.validation-qr-stage.is-expired .qr-code-logo {
+.validation-qr-stage.is-expired .qr-code-matrix {
   opacity: 0.38;
 }
 
@@ -499,26 +498,6 @@ body.modal-open {
   border-radius: 12px;
   background: #fff;
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
-}
-
-.qr-code-logo {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 14%;
-  max-width: 32px;
-  height: auto;
-  padding: 2px;
-  border-radius: 4px;
-  background: #fff;
-  box-shadow: 0 0 0 2px #fff;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-.validation-qr-stage.is-expired .qr-code-matrix,
-.validation-qr-stage.is-expired .qr-code-logo {
-  opacity: 0.38;
 }
 
 .validation-qr-validity {
