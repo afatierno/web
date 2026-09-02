@@ -27,6 +27,22 @@ export function isScannerSupported() {
   return window.isSecureContext && !!getMediaDevices();
 }
 
+function isProbablyMobile_() {
+  return /Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent);
+}
+
+function tryGetUserMedia_(media, attempts) {
+  let chain = Promise.reject(new Error("No hay intentos de cámara"));
+
+  attempts.forEach(function (constraints) {
+    chain = chain.catch(function () {
+      return media.getUserMedia(constraints);
+    });
+  });
+
+  return chain;
+}
+
 export function requestCameraStreamFromGesture() {
   const media = getMediaDevices();
 
@@ -34,27 +50,18 @@ export function requestCameraStreamFromGesture() {
     return Promise.reject(new Error("Este navegador no expone la API de cámara"));
   }
 
-  return media
-    .getUserMedia({
-      audio: false,
-      video: {
-        facingMode: { ideal: "environment" },
-      },
-    })
-    .catch(function () {
-      return media.getUserMedia({
-        audio: false,
-        video: {
-          facingMode: "user",
-        },
-      });
-    })
-    .catch(function () {
-      return media.getUserMedia({
-        audio: false,
-        video: true,
-      });
-    });
+  if (isProbablyMobile_()) {
+    return tryGetUserMedia_(media, [
+      { audio: false, video: { facingMode: { ideal: "environment" } } },
+      { audio: false, video: { facingMode: "user" } },
+      { audio: false, video: true },
+    ]);
+  }
+
+  return tryGetUserMedia_(media, [
+    { audio: false, video: { facingMode: "user" } },
+    { audio: false, video: true },
+  ]);
 }
 
 export function formatCameraError(error) {
@@ -97,6 +104,16 @@ function getHtml5Qrcode_() {
   return window.Html5Qrcode;
 }
 
+function stopStream_(mediaStream) {
+  if (!mediaStream) {
+    return;
+  }
+
+  mediaStream.getTracks().forEach(function (track) {
+    track.stop();
+  });
+}
+
 export function createQrScanner(options) {
   options = options || {};
 
@@ -115,19 +132,18 @@ export function createQrScanner(options) {
   let busy = false;
 
   function showNativeViewport_() {
-    if (video) {
-      video.hidden = false;
-    }
-
     if (libraryHost) {
       libraryHost.hidden = true;
+    }
+
+    if (video) {
+      video.hidden = false;
     }
   }
 
   function showLibraryViewport_() {
     if (video) {
       video.hidden = true;
-      video.srcObject = null;
     }
 
     if (libraryHost) {
@@ -135,37 +151,50 @@ export function createQrScanner(options) {
     }
   }
 
-  function stopStream_(mediaStream) {
-    if (!mediaStream) {
-      return;
+  async function attachStreamToVideo_(mediaStream) {
+    if (!video) {
+      throw new Error("No hay elemento de vídeo para la cámara");
     }
 
-    mediaStream.getTracks().forEach(function (track) {
-      track.stop();
+    showNativeViewport_();
+
+    video.muted = true;
+    video.playsInline = true;
+    video.autoplay = true;
+    video.srcObject = mediaStream;
+
+    await new Promise(function (resolve, reject) {
+      function cleanup() {
+        video.removeEventListener("loadedmetadata", onReady);
+        video.removeEventListener("error", onError);
+      }
+
+      function onReady() {
+        cleanup();
+        video.play().then(resolve).catch(reject);
+      }
+
+      function onError() {
+        cleanup();
+        reject(new Error("No se pudo mostrar la imagen de la cámara"));
+      }
+
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        video.play().then(resolve).catch(reject);
+        return;
+      }
+
+      video.addEventListener("loadedmetadata", onReady, { once: true });
+      video.addEventListener("error", onError, { once: true });
     });
   }
 
   async function startNativeWithStream_(mediaStream) {
     mode = "native";
-    showNativeViewport_();
-
-    try {
-      detector = new BarcodeDetector({ formats: ["qr_code"] });
-    } catch (error) {
-      stopStream_(mediaStream);
-      await startLibrary_();
-      return;
-    }
-
+    detector = new BarcodeDetector({ formats: ["qr_code"] });
     stream = mediaStream;
-    video.srcObject = stream;
 
-    try {
-      await video.play();
-    } catch (error) {
-      stopStream_(mediaStream);
-      throw error;
-    }
+    await attachStreamToVideo_(mediaStream);
 
     active = true;
     onStatus("Apunta al código QR del carnet");
@@ -173,7 +202,7 @@ export function createQrScanner(options) {
   }
 
   async function scanNativeFrame_() {
-    if (!active || busy || !detector || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+    if (!active || busy || !detector || !video || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
       return;
     }
 
@@ -198,7 +227,7 @@ export function createQrScanner(options) {
     }
   }
 
-  async function startLibrary_() {
+  async function startLibrary_(deviceId) {
     mode = "library";
     showLibraryViewport_();
 
@@ -215,13 +244,28 @@ export function createQrScanner(options) {
       },
     };
 
-    try {
-      await html5QrCode.start({ facingMode: { ideal: "environment" } }, scanConfig, onDecoded_, noopFrame_);
-    } catch (error) {
-      await html5QrCode.start({ facingMode: "user" }, scanConfig, onDecoded_, noopFrame_);
+    const cameraConfigs = deviceId
+      ? [{ deviceId: { exact: deviceId } }, { facingMode: "user" }, true]
+      : isProbablyMobile_()
+        ? [{ facingMode: { ideal: "environment" } }, { facingMode: "user" }, true]
+        : [{ facingMode: "user" }, true];
+
+    let lastError = null;
+
+    for (let i = 0; i < cameraConfigs.length; i++) {
+      const config = cameraConfigs[i];
+      const cameraConstraint = config === true ? { video: true } : { video: config };
+
+      try {
+        await html5QrCode.start(cameraConstraint, scanConfig, onDecoded_, noopFrame_);
+        onStatus("Apunta al código QR del carnet");
+        return;
+      } catch (error) {
+        lastError = error;
+      }
     }
 
-    onStatus("Apunta al código QR del carnet");
+    throw lastError || new Error("No se pudo iniciar el lector QR");
   }
 
   function onDecoded_(decodedText) {
@@ -240,21 +284,35 @@ export function createQrScanner(options) {
   function noopFrame_() {}
 
   async function startWithStream(mediaStream) {
-    if (active) {
-      return;
-    }
+    await stop();
 
     if (!mediaStream) {
       throw new Error("No se recibió la cámara");
     }
 
+    const track = mediaStream.getVideoTracks()[0];
+    const deviceId = track && track.getSettings ? track.getSettings().deviceId : "";
+
     if (canUseNativeBarcode_()) {
-      await startNativeWithStream_(mediaStream);
-      return;
+      try {
+        await startNativeWithStream_(mediaStream);
+        return;
+      } catch (error) {
+        stopStream_(mediaStream);
+        stream = null;
+
+        if (video) {
+          video.srcObject = null;
+        }
+
+        onStatus("Usando lector alternativo…");
+        await startLibrary_(deviceId);
+        return;
+      }
     }
 
     stopStream_(mediaStream);
-    await startLibrary_();
+    await startLibrary_(deviceId);
   }
 
   async function stopNative_() {
@@ -305,6 +363,13 @@ export function createQrScanner(options) {
       await stopNative_();
     } else if (mode === "library") {
       await stopLibrary_();
+    } else if (stream) {
+      stopStream_(stream);
+      stream = null;
+
+      if (video) {
+        video.srcObject = null;
+      }
     }
 
     mode = null;

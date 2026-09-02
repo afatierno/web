@@ -125,8 +125,12 @@ async function updateCameraPermissionHint_() {
 }
 
 async function stopScanner() {
-  if (scanner && scanner.isActive()) {
+  if (scanner) {
     await scanner.stop();
+  }
+
+  if (scannerVideo) {
+    scannerVideo.srcObject = null;
   }
 
   scannerViewport.hidden = true;
@@ -144,7 +148,22 @@ function handleCameraStartFailure_(error) {
 
 let scannerStartPending_ = false;
 
-function beginScannerFromUserGesture_() {
+function bindScannerStartButton_(button) {
+  button.addEventListener(
+    "pointerup",
+    function (event) {
+      if (event.pointerType === "mouse" && event.button !== 0) {
+        return;
+      }
+
+      event.preventDefault();
+      void beginScannerFromUserGestureAsync_();
+    },
+    false
+  );
+}
+
+async function beginScannerFromUserGestureAsync_() {
   if (scannerStartPending_) {
     return;
   }
@@ -156,26 +175,41 @@ function beginScannerFromUserGesture_() {
 
   scannerStartPending_ = true;
 
-  hideResult();
-  setStatus("", null);
-  scannerViewport.hidden = false;
-  toggleScannerButton.hidden = true;
-  scanAgainButton.hidden = false;
-  setScannerStatus("Pidiendo permiso de cámara al navegador…");
+  try {
+    await stopScanner();
 
-  const streamPromise = requestCameraStreamFromGesture();
+    hideResult();
+    setStatus("", null);
+    scannerViewport.hidden = false;
+    toggleScannerButton.hidden = true;
+    scanAgainButton.hidden = false;
+    setScannerStatus("Pidiendo permiso de cámara al navegador…");
 
-  streamPromise
-    .then(function (stream) {
-      setScannerStatus("Permiso concedido. Abriendo escáner…");
-      return ensureScanner().startWithStream(stream);
-    })
-    .catch(function (error) {
+    const stream = await requestCameraStreamFromGesture();
+
+    setScannerStatus("Permiso concedido. Abriendo escáner…");
+
+    try {
+      await ensureScanner().startWithStream(stream);
+    } catch (error) {
+      stopStreamTracks_(stream);
       handleCameraStartFailure_(error);
-    })
-    .finally(function () {
-      scannerStartPending_ = false;
-    });
+    }
+  } catch (error) {
+    handleCameraStartFailure_(error);
+  } finally {
+    scannerStartPending_ = false;
+  }
+}
+
+function stopStreamTracks_(stream) {
+  if (!stream) {
+    return;
+  }
+
+  stream.getTracks().forEach(function (track) {
+    track.stop();
+  });
 }
 
 async function validateRawInput(rawInput) {
@@ -233,21 +267,6 @@ function initMerchantPortal() {
 
   scannerSection.hidden = false;
   resetForNextScan();
-}
-
-function bindScannerStartButton_(button) {
-  button.addEventListener(
-    "pointerup",
-    function (event) {
-      if (event.pointerType === "mouse" && event.button !== 0) {
-        return;
-      }
-
-      event.preventDefault();
-      beginScannerFromUserGesture_();
-    },
-    false
-  );
 }
 
 bindScannerStartButton_(toggleScannerButton);
