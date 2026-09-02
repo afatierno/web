@@ -71,6 +71,16 @@ body {
   font-size: 0.95rem;
 }
 
+.merchant-label {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.merchant-label strong {
+  color: var(--accent);
+}
+
 .status-message {
   margin: 0;
   font-size: 1rem;
@@ -91,7 +101,8 @@ body {
 .scanner-section[hidden],
 .scanner-viewport[hidden],
 #result-card[hidden],
-#scan-again-button[hidden] {
+#scan-again-button[hidden],
+#merchant-label[hidden] {
   display: none;
 }
 
@@ -139,12 +150,17 @@ body {
   object-fit: cover;
 }
 
+/* html5-qrcode: sin esquinas blancas de la librería (usamos .scanner-frame) */
+.scanner-reader #qr-shaded-region,
+.scanner-reader #qr-shaded-region > div {
+  display: none !important;
+}
+
 .scanner-frame {
   position: absolute;
   inset: 12%;
-  border: 2px solid rgba(255, 255, 255, 0.85);
   border-radius: 16px;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
   pointer-events: none;
 }
 

@@ -4,8 +4,8 @@ const UUID_V4_REGEX =
 const CONFIG_PARAM = "c";
 const SESSION_KEY = "afa.comercio.access";
 
-/** Pon true cuando quieras exigir enlace ?c= de comercio. */
-export const REQUIRE_MERCHANT_ACCESS = false;
+/** Exige enlace ?c= de comercio validado contra el web app de Token. */
+export const REQUIRE_MERCHANT_ACCESS = true;
 
 export const OFFICIAL_DOMAIN = "afatierno.github.io";
 export const OFFICIAL_VALIDATION_PATH = "/web/carnet/web/validacion.html";

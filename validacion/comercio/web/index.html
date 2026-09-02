@@ -15,8 +15,11 @@
     <header class="page-header">
       <p class="page-eyebrow">AMPA/AFA Enrique Tierno Galván</p>
       <h1>Validación comercio <span id="app-version" class="page-version" aria-label="Versión de la aplicación">…</span></h1>
+      <p id="merchant-label" class="merchant-label" hidden>
+        Comercio autorizado: <strong id="merchant-name"></strong>
+      </p>
       <p class="access-notice">
-        Si ya diste permiso de cámara, el escáner se abrirá solo. Si no, pulsa el botón cuando aparezca.
+        Acceso exclusivo por enlace de comercio. Si ya diste permiso de cámara, el escáner se abrirá solo.
       </p>
     </header>
 
@@ -30,7 +33,7 @@
       <p id="scanner-status" class="scanner-status" aria-live="polite"></p>
       <div class="scanner-actions">
         <button id="toggle-scanner-button" type="button" class="primary-button">Permitir cámara y escanear</button>
-        <button id="scan-again-button" type="button" class="secondary-button" hidden>Escanear otro</button>
+        <button id="scan-again-button" type="button" class="primary-button" hidden>Escanear otro</button>
       </div>
     </section>
 
