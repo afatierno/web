@@ -113,11 +113,15 @@ body {
   box-shadow: var(--shadow);
 }
 
-.scanner-video {
+.scanner-viewport:not([hidden]) {
   display: block;
+}
+
+.scanner-video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  background: #000;
 }
 
 .scanner-reader {
