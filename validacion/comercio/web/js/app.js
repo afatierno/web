@@ -13,9 +13,11 @@ const {
   CONFIG_ERROR,
   CONFIG_PENDING_REDIRECT,
   REQUIRE_MERCHANT_ACCESS,
+  clearAccessSession,
 } = await import("./config.js?" + moduleQuery_);
 const { parseValidationQrPayload } = await import("./qr-parser.js?" + moduleQuery_);
 const { fetchValidation } = await import("./validation-api.js?" + moduleQuery_);
+const { fetchMerchantAccess } = await import("./merchant-api.js?" + moduleQuery_);
 const { createQrScanner, formatCameraError, isScannerSupported, requestCameraStreamFromGesture } =
   await import("./scanner.js?" + moduleQuery_);
 
@@ -32,6 +34,8 @@ const resultTitle = document.getElementById("result-title");
 const resultBody = document.getElementById("result-body");
 const pdfLink = document.getElementById("pdf-link");
 const appVersion = document.getElementById("app-version");
+const merchantLabel = document.getElementById("merchant-label");
+const merchantName = document.getElementById("merchant-name");
 
 const CAMERA_PROMPT_MESSAGE =
   "Pulsa «Permitir cámara y escanear». Debe aparecer el aviso del sistema o del navegador.";
@@ -294,17 +298,57 @@ async function validateRawInput(rawInput) {
   }
 }
 
-function initMerchantPortal() {
+function showMerchantName(name) {
+  if (!merchantLabel || !merchantName) {
+    return;
+  }
+
+  merchantName.textContent = name;
+  merchantLabel.hidden = false;
+}
+
+function hideMerchantName() {
+  if (merchantLabel) {
+    merchantLabel.hidden = true;
+  }
+
+  if (merchantName) {
+    merchantName.textContent = "";
+  }
+}
+
+async function initMerchantPortal() {
   if (REQUIRE_MERCHANT_ACCESS && (CONFIG_ERROR || !CONFIG)) {
     scannerSection.hidden = true;
+    hideMerchantName();
     showError(CONFIG_ERROR || "Enlace de comercio no válido");
     return;
   }
 
   if (CONFIG_ERROR) {
     scannerSection.hidden = true;
+    hideMerchantName();
     showError(CONFIG_ERROR);
     return;
+  }
+
+  if (REQUIRE_MERCHANT_ACCESS && CONFIG) {
+    showLoading("Comprobando acceso de comercio…");
+
+    try {
+      const merchant = await fetchMerchantAccess(CONFIG);
+      showMerchantName(merchant.nombre);
+    } catch (error) {
+      clearAccessSession();
+      scannerSection.hidden = true;
+      hideMerchantName();
+      showError(
+        error && error.message
+          ? error.message
+          : "No se pudo comprobar el acceso de comercio"
+      );
+      return;
+    }
   }
 
   scannerSection.hidden = false;
@@ -331,5 +375,5 @@ if (appVersion) {
 }
 
 if (!CONFIG_PENDING_REDIRECT) {
-  initMerchantPortal();
+  void initMerchantPortal();
 }

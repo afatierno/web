@@ -137,7 +137,7 @@ export function createQrScanner(options) {
     const scanConfig = {
       fps: 10,
       qrbox: function (viewfinderWidth, viewfinderHeight) {
-        const edge = Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.72);
+        const edge = Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.76);
         return { width: edge, height: edge };
       },
     };
