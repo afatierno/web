@@ -1,15 +1,23 @@
-import { APP_VERSION } from "./asset-version.js?v=0008";
-import {
+const moduleParams_ = new URL(import.meta.url).searchParams;
+const moduleQuery_ =
+  "v=" +
+  encodeURIComponent(moduleParams_.get("v") || "") +
+  "&b=" +
+  encodeURIComponent(moduleParams_.get("b") || String(Date.now()));
+
+const { APP_VERSION } = await import("./asset-version.js?" + moduleQuery_);
+const {
   CERTIFIED_PDF_FILENAME,
   CERTIFIED_PDF_URL,
   CONFIG,
   CONFIG_ERROR,
   CONFIG_PENDING_REDIRECT,
   REQUIRE_MERCHANT_ACCESS,
-} from "./config.js?v=0008";
-import { parseValidationQrPayload } from "./qr-parser.js?v=0008";
-import { fetchValidation } from "./validation-api.js?v=0008";
-import { createQrScanner, isScannerSupported } from "./scanner.js?v=0008";
+} = await import("./config.js?" + moduleQuery_);
+const { parseValidationQrPayload } = await import("./qr-parser.js?" + moduleQuery_);
+const { fetchValidation } = await import("./validation-api.js?" + moduleQuery_);
+const { createQrScanner, formatCameraError, isScannerSupported, requestCameraStreamFromGesture } =
+  await import("./scanner.js?" + moduleQuery_);
 
 const scannerSection = document.getElementById("scanner-section");
 const scannerViewport = document.getElementById("scanner-viewport");
@@ -26,10 +34,7 @@ const pdfLink = document.getElementById("pdf-link");
 const appVersion = document.getElementById("app-version");
 
 const CAMERA_PROMPT_MESSAGE =
-  "Pulsa «Permitir cámara y escanear». El navegador te pedirá permiso, igual que en Google Meet.";
-
-const CAMERA_DENIED_MESSAGE =
-  "Cámara bloqueada. En Chrome/Brave: toca el candado o ⋮ junto a la URL → Permisos → Cámara → Permitir, y recarga.";
+  "Pulsa «Permitir cámara y escanear». Debe aparecer el aviso del sistema o del navegador.";
 
 let activeController = null;
 let scanner = null;
@@ -110,38 +115,13 @@ async function updateCameraPermissionHint_() {
   if (!isScannerSupported()) {
     setScannerStatus(
       !window.isSecureContext
-        ? "La cámara solo funciona con HTTPS o localhost."
-        : "Este navegador no puede usar la cámara. Prueba Chrome, Edge o Firefox."
+        ? "Sin HTTPS: la cámara no está disponible (" + String(window.location.protocol) + ")."
+        : "Este navegador no expone la API de cámara."
     );
     return;
   }
 
-  if (!navigator.permissions || typeof navigator.permissions.query !== "function") {
-    setScannerStatus(CAMERA_PROMPT_MESSAGE);
-    return;
-  }
-
-  try {
-    const permission = await navigator.permissions.query({ name: "camera" });
-
-    if (permission.state === "denied") {
-      setScannerStatus(CAMERA_DENIED_MESSAGE);
-      return;
-    }
-
-    if (permission.state === "granted") {
-      setScannerStatus("Permiso de cámara ya concedido. Pulsa el botón para abrir el escáner.");
-      return;
-    }
-
-    setScannerStatus(CAMERA_PROMPT_MESSAGE);
-
-    permission.onchange = function () {
-      updateCameraPermissionHint_();
-    };
-  } catch {
-    setScannerStatus(CAMERA_PROMPT_MESSAGE);
-  }
+  setScannerStatus(CAMERA_PROMPT_MESSAGE);
 }
 
 async function stopScanner() {
@@ -153,34 +133,49 @@ async function stopScanner() {
   setScannerStatus("");
 }
 
-async function startScanner() {
-  const instance = ensureScanner();
+function handleCameraStartFailure_(error) {
+  scannerViewport.hidden = true;
+  toggleScannerButton.hidden = false;
+  scanAgainButton.hidden = true;
+  setScannerStatus("");
+  showError(formatCameraError(error));
+  resetForNextScan();
+}
+
+let scannerStartPending_ = false;
+
+function beginScannerFromUserGesture_() {
+  if (scannerStartPending_) {
+    return;
+  }
+
+  if (!isScannerSupported()) {
+    showError("La cámara no está disponible en este navegador o contexto.");
+    return;
+  }
+
+  scannerStartPending_ = true;
 
   hideResult();
   setStatus("", null);
   scannerViewport.hidden = false;
   toggleScannerButton.hidden = true;
   scanAgainButton.hidden = false;
+  setScannerStatus("Pidiendo permiso de cámara al navegador…");
 
-  try {
-    await instance.start();
-  } catch (error) {
-    scannerViewport.hidden = true;
-    toggleScannerButton.hidden = false;
-    scanAgainButton.hidden = true;
-    setScannerStatus("");
+  const streamPromise = requestCameraStreamFromGesture();
 
-    if (error && (error.name === "NotAllowedError" || error.name === "SecurityError")) {
-      setScannerStatus(CAMERA_DENIED_MESSAGE);
-      return;
-    }
-
-    showError(
-      error && error.message
-        ? error.message
-        : "No se pudo activar la cámara. Comprueba los permisos del navegador."
-    );
-  }
+  streamPromise
+    .then(function (stream) {
+      setScannerStatus("Permiso concedido. Abriendo escáner…");
+      return ensureScanner().startWithStream(stream);
+    })
+    .catch(function (error) {
+      handleCameraStartFailure_(error);
+    })
+    .finally(function () {
+      scannerStartPending_ = false;
+    });
 }
 
 async function validateRawInput(rawInput) {
@@ -240,9 +235,22 @@ function initMerchantPortal() {
   resetForNextScan();
 }
 
-toggleScannerButton.addEventListener("click", function () {
-  startScanner();
-});
+function bindScannerStartButton_(button) {
+  button.addEventListener(
+    "pointerup",
+    function (event) {
+      if (event.pointerType === "mouse" && event.button !== 0) {
+        return;
+      }
+
+      event.preventDefault();
+      beginScannerFromUserGesture_();
+    },
+    false
+  );
+}
+
+bindScannerStartButton_(toggleScannerButton);
 
 scanAgainButton.addEventListener("click", async function () {
   await stopScanner();

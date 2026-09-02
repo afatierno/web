@@ -1,51 +1,88 @@
 const SCAN_INTERVAL_MS = 180;
 
-export function isScannerSupported() {
-  if (!window.isSecureContext) {
-    return false;
+export function getMediaDevices() {
+  if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === "function") {
+    return navigator.mediaDevices;
   }
 
-  return (
-    typeof navigator.mediaDevices !== "undefined" &&
-    typeof navigator.mediaDevices.getUserMedia === "function"
-  );
+  const legacyGetUserMedia =
+    navigator.getUserMedia ||
+    navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia;
+
+  if (typeof legacyGetUserMedia !== "function") {
+    return null;
+  }
+
+  return {
+    getUserMedia: function (constraints) {
+      return new Promise(function (resolve, reject) {
+        legacyGetUserMedia.call(navigator, constraints, resolve, reject);
+      });
+    },
+  };
 }
 
-async function requestVideoStream_() {
-  const attempts = [
-    {
+export function isScannerSupported() {
+  return window.isSecureContext && !!getMediaDevices();
+}
+
+export function requestCameraStreamFromGesture() {
+  const media = getMediaDevices();
+
+  if (!media) {
+    return Promise.reject(new Error("Este navegador no expone la API de cámara"));
+  }
+
+  return media
+    .getUserMedia({
       audio: false,
       video: {
         facingMode: { ideal: "environment" },
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
       },
-    },
-    {
-      audio: false,
-      video: {
-        facingMode: "user",
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-      },
-    },
-    {
-      audio: false,
-      video: true,
-    },
-  ];
+    })
+    .catch(function () {
+      return media.getUserMedia({
+        audio: false,
+        video: {
+          facingMode: "user",
+        },
+      });
+    })
+    .catch(function () {
+      return media.getUserMedia({
+        audio: false,
+        video: true,
+      });
+    });
+}
 
-  let lastError = null;
-
-  for (let i = 0; i < attempts.length; i++) {
-    try {
-      return await navigator.mediaDevices.getUserMedia(attempts[i]);
-    } catch (error) {
-      lastError = error;
-    }
+export function formatCameraError(error) {
+  if (!error) {
+    return "No se pudo acceder a la cámara";
   }
 
-  throw lastError || new Error("No se pudo acceder a ninguna cámara");
+  if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+    return (
+      "Permiso de cámara denegado (" +
+      error.name +
+      "). En Chrome/Brave: ⋮ o candado en la barra → Cámara → Permitir, y recarga."
+    );
+  }
+
+  if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+    return "No se detectó ninguna cámara en este dispositivo (" + error.name + ").";
+  }
+
+  if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+    return "La cámara está en uso por otra app (" + error.name + ").";
+  }
+
+  if (error.name === "SecurityError") {
+    return "El navegador bloqueó la cámara por seguridad (" + error.name + ").";
+  }
+
+  return (error.message || "No se pudo acceder a la cámara") + " (" + (error.name || "Error") + ")";
 }
 
 function canUseNativeBarcode_() {
@@ -112,11 +149,23 @@ export function createQrScanner(options) {
     mode = "native";
     showNativeViewport_();
 
-    detector = new BarcodeDetector({ formats: ["qr_code"] });
-    stream = mediaStream;
+    try {
+      detector = new BarcodeDetector({ formats: ["qr_code"] });
+    } catch (error) {
+      stopStream_(mediaStream);
+      await startLibrary_();
+      return;
+    }
 
+    stream = mediaStream;
     video.srcObject = stream;
-    await video.play();
+
+    try {
+      await video.play();
+    } catch (error) {
+      stopStream_(mediaStream);
+      throw error;
+    }
 
     active = true;
     onStatus("Apunta al código QR del carnet");
@@ -190,39 +239,21 @@ export function createQrScanner(options) {
 
   function noopFrame_() {}
 
-  async function start() {
+  async function startWithStream(mediaStream) {
     if (active) {
       return;
     }
 
-    if (!isScannerSupported()) {
-      throw new Error(
-        "Este dispositivo no permite usar la cámara. Abre la página con https:// o localhost."
-      );
-    }
-
-    onStatus("Solicitando acceso a la cámara…");
-
-    let prestream;
-
-    try {
-      prestream = await requestVideoStream_();
-    } catch (error) {
-      if (error && error.name === "NotAllowedError") {
-        throw new Error(
-          "Permiso de cámara denegado. En Brave/Chrome: candado o ⋮ en la barra → Cámara → Permitir."
-        );
-      }
-
-      throw error;
+    if (!mediaStream) {
+      throw new Error("No se recibió la cámara");
     }
 
     if (canUseNativeBarcode_()) {
-      await startNativeWithStream_(prestream);
+      await startNativeWithStream_(mediaStream);
       return;
     }
 
-    stopStream_(prestream);
+    stopStream_(mediaStream);
     await startLibrary_();
   }
 
@@ -280,7 +311,7 @@ export function createQrScanner(options) {
   }
 
   return {
-    start: start,
+    startWithStream: startWithStream,
     stop: stop,
     isActive: function () {
       return active;
