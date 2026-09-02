@@ -36,6 +36,9 @@ const appVersion = document.getElementById("app-version");
 const CAMERA_PROMPT_MESSAGE =
   "Pulsa «Permitir cámara y escanear». Debe aparecer el aviso del sistema o del navegador.";
 
+const CAMERA_DENIED_MESSAGE =
+  "Cámara bloqueada. Actívala en los permisos del sitio y recarga la página.";
+
 let activeController = null;
 let scanner = null;
 let validating = false;
@@ -101,23 +104,58 @@ function ensureScanner() {
   return scanner;
 }
 
-function resetForNextScan() {
+function resetForNextScan(options) {
+  options = options || {};
+
   hideResult();
   setStatus("", null);
   scanAgainButton.hidden = true;
   toggleScannerButton.hidden = false;
   toggleScannerButton.textContent = "Permitir cámara y escanear";
   toggleScannerButton.disabled = !isScannerSupported();
-  updateCameraPermissionHint_();
+
+  void updateScannerEntry_(options.autoStart !== false);
 }
 
-async function updateCameraPermissionHint_() {
+async function queryCameraPermission_() {
+  if (!navigator.permissions || typeof navigator.permissions.query !== "function") {
+    return "unknown";
+  }
+
+  try {
+    const status = await navigator.permissions.query({ name: "camera" });
+    return status.state;
+  } catch {
+    return "unknown";
+  }
+}
+
+async function updateScannerEntry_(autoStart) {
   if (!isScannerSupported()) {
     setScannerStatus(
       !window.isSecureContext
         ? "Sin HTTPS: la cámara no está disponible (" + String(window.location.protocol) + ")."
         : "Este navegador no expone la API de cámara."
     );
+    return;
+  }
+
+  const permissionState = await queryCameraPermission_();
+
+  if (permissionState === "denied") {
+    setScannerStatus(CAMERA_DENIED_MESSAGE);
+    toggleScannerButton.disabled = true;
+    return;
+  }
+
+  if (autoStart && permissionState === "granted") {
+    toggleScannerButton.hidden = true;
+    await beginScannerFromUserGestureAsync_(true);
+    return;
+  }
+
+  if (permissionState === "granted") {
+    setScannerStatus("Permiso de cámara concedido. Pulsa el botón para escanear.");
     return;
   }
 
@@ -143,7 +181,7 @@ function handleCameraStartFailure_(error) {
   scanAgainButton.hidden = true;
   setScannerStatus("");
   showError(formatCameraError(error));
-  resetForNextScan();
+  resetForNextScan({ autoStart: false });
 }
 
 let scannerStartPending_ = false;
@@ -157,13 +195,13 @@ function bindScannerStartButton_(button) {
       }
 
       event.preventDefault();
-      void beginScannerFromUserGestureAsync_();
+      void beginScannerFromUserGestureAsync_(false);
     },
     false
   );
 }
 
-async function beginScannerFromUserGestureAsync_() {
+async function beginScannerFromUserGestureAsync_(alreadyGranted) {
   if (scannerStartPending_) {
     return;
   }
@@ -183,11 +221,15 @@ async function beginScannerFromUserGestureAsync_() {
     scannerViewport.hidden = false;
     toggleScannerButton.hidden = true;
     scanAgainButton.hidden = false;
-    setScannerStatus("Pidiendo permiso de cámara al navegador…");
+    setScannerStatus(
+      alreadyGranted ? "Abriendo escáner…" : "Pidiendo permiso de cámara al navegador…"
+    );
 
     const stream = await requestCameraStreamFromGesture();
 
-    setScannerStatus("Permiso concedido. Abriendo escáner…");
+    if (!alreadyGranted) {
+      setScannerStatus("Permiso concedido. Abriendo escáner…");
+    }
 
     try {
       await ensureScanner().startWithStream(stream);
