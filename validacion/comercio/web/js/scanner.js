@@ -1,8 +1,4 @@
 const SCAN_INTERVAL_MS = 180;
-const HTML5_QRCODE_URL =
-  "https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js";
-
-let html5QrcodeLoader_ = null;
 
 export function isScannerSupported() {
   if (!window.isSecureContext) {
@@ -56,32 +52,12 @@ function canUseNativeBarcode_() {
   return typeof window.BarcodeDetector === "function";
 }
 
-function loadHtml5Qrcode_() {
-  if (window.Html5Qrcode) {
-    return Promise.resolve(window.Html5Qrcode);
+function getHtml5Qrcode_() {
+  if (typeof window.Html5Qrcode !== "function") {
+    throw new Error("No se cargó el lector QR. Recarga la página.");
   }
 
-  if (!html5QrcodeLoader_) {
-    html5QrcodeLoader_ = new Promise(function (resolve, reject) {
-      const script = document.createElement("script");
-      script.src = HTML5_QRCODE_URL;
-      script.async = true;
-      script.onload = function () {
-        if (window.Html5Qrcode) {
-          resolve(window.Html5Qrcode);
-          return;
-        }
-
-        reject(new Error("No se pudo cargar el lector QR alternativo"));
-      };
-      script.onerror = function () {
-        reject(new Error("No se pudo cargar el lector QR alternativo"));
-      };
-      document.head.appendChild(script);
-    });
-  }
-
-  return html5QrcodeLoader_;
+  return window.Html5Qrcode;
 }
 
 export function createQrScanner(options) {
@@ -122,13 +98,22 @@ export function createQrScanner(options) {
     }
   }
 
-  async function startNative_() {
+  function stopStream_(mediaStream) {
+    if (!mediaStream) {
+      return;
+    }
+
+    mediaStream.getTracks().forEach(function (track) {
+      track.stop();
+    });
+  }
+
+  async function startNativeWithStream_(mediaStream) {
     mode = "native";
     showNativeViewport_();
-    onStatus("Solicitando acceso a la cámara…");
 
     detector = new BarcodeDetector({ formats: ["qr_code"] });
-    stream = await requestVideoStream_();
+    stream = mediaStream;
 
     video.srcObject = stream;
     await video.play();
@@ -167,13 +152,11 @@ export function createQrScanner(options) {
   async function startLibrary_() {
     mode = "library";
     showLibraryViewport_();
-    onStatus("Preparando lector QR…");
 
-    const Html5Qrcode = await loadHtml5Qrcode_();
+    const Html5Qrcode = getHtml5Qrcode_();
 
     html5QrCode = new Html5Qrcode(libraryHost.id);
     active = true;
-    onStatus("Solicitando acceso a la cámara…");
 
     const scanConfig = {
       fps: 10,
@@ -214,15 +197,32 @@ export function createQrScanner(options) {
 
     if (!isScannerSupported()) {
       throw new Error(
-        "Este dispositivo no permite usar la cámara. Prueba con Chrome o Safari en el móvil."
+        "Este dispositivo no permite usar la cámara. Abre la página con https:// o localhost."
       );
     }
 
+    onStatus("Solicitando acceso a la cámara…");
+
+    let prestream;
+
+    try {
+      prestream = await requestVideoStream_();
+    } catch (error) {
+      if (error && error.name === "NotAllowedError") {
+        throw new Error(
+          "Permiso de cámara denegado. En Brave/Chrome: candado o ⋮ en la barra → Cámara → Permitir."
+        );
+      }
+
+      throw error;
+    }
+
     if (canUseNativeBarcode_()) {
-      await startNative_();
+      await startNativeWithStream_(prestream);
       return;
     }
 
+    stopStream_(prestream);
     await startLibrary_();
   }
 
@@ -232,12 +232,8 @@ export function createQrScanner(options) {
       scanTimer = null;
     }
 
-    if (stream) {
-      stream.getTracks().forEach(function (track) {
-        track.stop();
-      });
-      stream = null;
-    }
+    stopStream_(stream);
+    stream = null;
 
     if (video) {
       video.srcObject = null;

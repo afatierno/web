@@ -1,4 +1,4 @@
-import { APP_VERSION } from "./asset-version.js?v=0007";
+import { APP_VERSION } from "./asset-version.js?v=0008";
 import {
   CERTIFIED_PDF_FILENAME,
   CERTIFIED_PDF_URL,
@@ -6,10 +6,10 @@ import {
   CONFIG_ERROR,
   CONFIG_PENDING_REDIRECT,
   REQUIRE_MERCHANT_ACCESS,
-} from "./config.js?v=0007";
-import { parseValidationQrPayload } from "./qr-parser.js?v=0007";
-import { fetchValidation } from "./validation-api.js?v=0007";
-import { createQrScanner, isScannerSupported } from "./scanner.js?v=0007";
+} from "./config.js?v=0008";
+import { parseValidationQrPayload } from "./qr-parser.js?v=0008";
+import { fetchValidation } from "./validation-api.js?v=0008";
+import { createQrScanner, isScannerSupported } from "./scanner.js?v=0008";
 
 const scannerSection = document.getElementById("scanner-section");
 const scannerViewport = document.getElementById("scanner-viewport");
@@ -29,7 +29,7 @@ const CAMERA_PROMPT_MESSAGE =
   "Pulsa «Permitir cámara y escanear». El navegador te pedirá permiso, igual que en Google Meet.";
 
 const CAMERA_DENIED_MESSAGE =
-  "La cámara está bloqueada para este sitio. Revísalo en los ajustes del navegador (candado junto a la URL).";
+  "Cámara bloqueada. En Chrome/Brave: toca el candado o ⋮ junto a la URL → Permisos → Cámara → Permitir, y recarga.";
 
 let activeController = null;
 let scanner = null;
