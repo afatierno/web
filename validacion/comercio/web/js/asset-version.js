@@ -1,2 +1,2 @@
 /** Sube APP_VERSION al desplegar. bootstrap.js detecta cambios y recarga sola. */
-export const APP_VERSION = "0021";
+export const APP_VERSION = "0022";
