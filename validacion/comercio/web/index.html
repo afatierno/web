@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="theme-color" content="#ffffff">
+  <title>Validación comercio</title>
+  <link rel="stylesheet" href="css/styles.css?v=0002">
+</head>
+<body>
+  <main class="page validation-page">
+    <header class="page-header">
+      <p class="page-eyebrow">AMPA/AFA Enrique Tierno Galván</p>
+      <h1>Validación comercio</h1>
+      <p class="access-notice">
+        Enlace reservado a comercios colaboradores. Usa Chrome o Safari en el móvil para escanear el QR.
+      </p>
+    </header>
+
+    <section id="scanner-section" class="scanner-section" hidden>
+      <p class="scanner-intro">Escanea el código QR del carnet del socio.</p>
+      <div id="scanner-viewport" class="scanner-viewport" hidden>
+        <video id="scanner-video" class="scanner-video" playsinline muted aria-hidden="true"></video>
+        <div id="scanner-reader" class="scanner-reader" hidden></div>
+        <div class="scanner-frame" aria-hidden="true"></div>
+      </div>
+      <p id="scanner-status" class="scanner-status" aria-live="polite"></p>
+      <div class="scanner-actions">
+        <button id="toggle-scanner-button" type="button" class="primary-button">Activar cámara</button>
+        <button id="scan-again-button" type="button" class="secondary-button" hidden>Escanear otro</button>
+      </div>
+    </section>
+
+    <p id="status-message" class="status-message" aria-live="polite"></p>
+
+    <section id="result-card" class="result-card" hidden>
+      <h2 id="result-title"></h2>
+      <p id="result-body"></p>
+      <ol class="validation-tips">
+        <li>
+          Esta comprobación se ha hecho desde la herramienta oficial de comercio del AFA, no desde un enlace
+          abierto por el socio.
+        </li>
+        <li>
+          Comprueba el dominio del carné. Debe visualizarse desde
+          <a href="https://afatierno.github.io/" target="_blank" rel="noopener noreferrer">https://afatierno.github.io/</a>.
+        </li>
+        <li>
+          Contrasta el titular que presenta el carné con un documento oficial si lo necesitas.
+        </li>
+      </ol>
+      <a id="pdf-link" class="pdf-action-button primary" href="#" download>
+        Ver certificado firmado (PDF)
+      </a>
+    </section>
+  </main>
+
+  <script src="js/app.js?v=0002" type="module"></script>
+</body>
+</html>
