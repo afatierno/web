@@ -61,6 +61,7 @@ function setScannerStatus(message) {
 function hideResult() {
   resultCard.hidden = true;
   resultCard.className = "result-card";
+  pdfLink.hidden = false;
 }
 
 function showLoading(message) {
@@ -78,7 +79,22 @@ function showValid(numSocio) {
   resultBody.textContent = "El carnet del socio " + numSocio + " es válido.";
   resultCard.className = "result-card result-card-valid";
   resultCard.hidden = false;
+  pdfLink.hidden = false;
   setStatus("", null);
+}
+
+function showInvalid(message) {
+  resultTitle.textContent = "Carnet no válido";
+  resultBody.textContent = message || "No se pudo validar el carnet.";
+  resultCard.className = "result-card result-card-invalid";
+  resultCard.hidden = false;
+  pdfLink.hidden = true;
+  setStatus("", null);
+}
+
+function showScanResultActions() {
+  scanAgainButton.hidden = false;
+  toggleScannerButton.hidden = true;
 }
 
 function configurePdfLink() {
@@ -264,8 +280,9 @@ async function validateRawInput(rawInput) {
   const parsed = parseValidationQrPayload(rawInput);
 
   if (parsed.error) {
-    showError(parsed.error);
-    resetForNextScan();
+    await stopScanner();
+    showInvalid(parsed.error);
+    showScanResultActions();
     return;
   }
 
@@ -281,15 +298,14 @@ async function validateRawInput(rawInput) {
   try {
     const data = await fetchValidation(parsed.config, activeController.signal);
     showValid(data.numSocio);
-    scanAgainButton.hidden = false;
-    toggleScannerButton.hidden = true;
+    showScanResultActions();
   } catch (error) {
     if (error && error.name === "AbortError") {
       return;
     }
 
-    showError(error && error.message ? error.message : "No se pudo validar el carnet");
-    resetForNextScan();
+    showInvalid(error && error.message ? error.message : "No se pudo validar el carnet");
+    showScanResultActions();
   } finally {
     validating = false;
     activeController = null;

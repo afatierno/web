@@ -219,6 +219,41 @@ body {
   text-align: center;
 }
 
+.result-icon {
+  display: none;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  border-radius: 999px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.result-card-invalid .result-icon-invalid {
+  display: inline-flex;
+}
+
+.result-card-valid .result-icon-valid {
+  display: inline-flex;
+}
+
+.result-icon-valid {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.result-icon-invalid {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+#pdf-link[hidden] {
+  display: none;
+}
+
 .validation-page .result-card h2 {
   margin: 0 0 10px;
   font-size: 1.3rem;
@@ -264,6 +299,10 @@ body {
 
 .result-card-invalid h2 {
   color: #991b1b;
+}
+
+.result-card-invalid .validation-tips {
+  display: none;
 }
 
 @media (min-width: 640px) {
