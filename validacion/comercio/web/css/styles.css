@@ -57,14 +57,6 @@ body {
   line-height: 1.2;
 }
 
-.page-version {
-  color: var(--accent);
-  font-size: 0.72em;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  vertical-align: middle;
-}
-
 .access-notice {
   margin: 0;
   color: var(--muted);

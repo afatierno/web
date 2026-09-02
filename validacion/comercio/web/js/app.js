@@ -5,7 +5,6 @@ const moduleQuery_ =
   "&b=" +
   encodeURIComponent(moduleParams_.get("b") || String(Date.now()));
 
-const { APP_VERSION } = await import("./asset-version.js?" + moduleQuery_);
 const {
   CERTIFIED_PDF_FILENAME,
   CERTIFIED_PDF_URL,
@@ -33,7 +32,6 @@ const resultCard = document.getElementById("result-card");
 const resultTitle = document.getElementById("result-title");
 const resultBody = document.getElementById("result-body");
 const pdfLink = document.getElementById("pdf-link");
-const appVersion = document.getElementById("app-version");
 const merchantLabel = document.getElementById("merchant-label");
 const merchantName = document.getElementById("merchant-name");
 
@@ -369,10 +367,6 @@ window.addEventListener("pagehide", function () {
 });
 
 configurePdfLink();
-
-if (appVersion) {
-  appVersion.textContent = "v" + APP_VERSION;
-}
 
 if (!CONFIG_PENDING_REDIRECT) {
   void initMerchantPortal();
