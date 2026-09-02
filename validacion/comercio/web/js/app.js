@@ -1,3 +1,4 @@
+import { APP_VERSION } from "./asset-version.js?v=0007";
 import {
   CERTIFIED_PDF_FILENAME,
   CERTIFIED_PDF_URL,
@@ -5,10 +6,10 @@ import {
   CONFIG_ERROR,
   CONFIG_PENDING_REDIRECT,
   REQUIRE_MERCHANT_ACCESS,
-} from "./config.js?v=0003";
-import { parseValidationQrPayload } from "./qr-parser.js?v=0003";
-import { fetchValidation } from "./validation-api.js?v=0003";
-import { createQrScanner, isScannerSupported } from "./scanner.js?v=0003";
+} from "./config.js?v=0007";
+import { parseValidationQrPayload } from "./qr-parser.js?v=0007";
+import { fetchValidation } from "./validation-api.js?v=0007";
+import { createQrScanner, isScannerSupported } from "./scanner.js?v=0007";
 
 const scannerSection = document.getElementById("scanner-section");
 const scannerViewport = document.getElementById("scanner-viewport");
@@ -22,9 +23,13 @@ const resultCard = document.getElementById("result-card");
 const resultTitle = document.getElementById("result-title");
 const resultBody = document.getElementById("result-body");
 const pdfLink = document.getElementById("pdf-link");
+const appVersion = document.getElementById("app-version");
 
-const UNSUPPORTED_BROWSER_MESSAGE =
-  "Este navegador no puede escanear QR. Usa Chrome o Safari en un móvil con cámara.";
+const CAMERA_PROMPT_MESSAGE =
+  "Pulsa «Permitir cámara y escanear». El navegador te pedirá permiso, igual que en Google Meet.";
+
+const CAMERA_DENIED_MESSAGE =
+  "La cámara está bloqueada para este sitio. Revísalo en los ajustes del navegador (candado junto a la URL).";
 
 let activeController = null;
 let scanner = null;
@@ -96,8 +101,47 @@ function resetForNextScan() {
   setStatus("", null);
   scanAgainButton.hidden = true;
   toggleScannerButton.hidden = false;
-  toggleScannerButton.textContent = "Activar cámara";
+  toggleScannerButton.textContent = "Permitir cámara y escanear";
   toggleScannerButton.disabled = !isScannerSupported();
+  updateCameraPermissionHint_();
+}
+
+async function updateCameraPermissionHint_() {
+  if (!isScannerSupported()) {
+    setScannerStatus(
+      !window.isSecureContext
+        ? "La cámara solo funciona con HTTPS o localhost."
+        : "Este navegador no puede usar la cámara. Prueba Chrome, Edge o Firefox."
+    );
+    return;
+  }
+
+  if (!navigator.permissions || typeof navigator.permissions.query !== "function") {
+    setScannerStatus(CAMERA_PROMPT_MESSAGE);
+    return;
+  }
+
+  try {
+    const permission = await navigator.permissions.query({ name: "camera" });
+
+    if (permission.state === "denied") {
+      setScannerStatus(CAMERA_DENIED_MESSAGE);
+      return;
+    }
+
+    if (permission.state === "granted") {
+      setScannerStatus("Permiso de cámara ya concedido. Pulsa el botón para abrir el escáner.");
+      return;
+    }
+
+    setScannerStatus(CAMERA_PROMPT_MESSAGE);
+
+    permission.onchange = function () {
+      updateCameraPermissionHint_();
+    };
+  } catch {
+    setScannerStatus(CAMERA_PROMPT_MESSAGE);
+  }
 }
 
 async function stopScanner() {
@@ -125,10 +169,16 @@ async function startScanner() {
     toggleScannerButton.hidden = false;
     scanAgainButton.hidden = true;
     setScannerStatus("");
+
+    if (error && (error.name === "NotAllowedError" || error.name === "SecurityError")) {
+      setScannerStatus(CAMERA_DENIED_MESSAGE);
+      return;
+    }
+
     showError(
       error && error.message
         ? error.message
-        : "No se pudo activar la cámara. Usa Chrome o Safari en el móvil."
+        : "No se pudo activar la cámara. Comprueba los permisos del navegador."
     );
   }
 }
@@ -188,11 +238,6 @@ function initMerchantPortal() {
 
   scannerSection.hidden = false;
   resetForNextScan();
-
-  if (!isScannerSupported()) {
-    setScannerStatus(UNSUPPORTED_BROWSER_MESSAGE);
-    toggleScannerButton.disabled = true;
-  }
 }
 
 toggleScannerButton.addEventListener("click", function () {
@@ -211,6 +256,10 @@ window.addEventListener("pagehide", function () {
 });
 
 configurePdfLink();
+
+if (appVersion) {
+  appVersion.textContent = "v" + APP_VERSION;
+}
 
 if (!CONFIG_PENDING_REDIRECT) {
   initMerchantPortal();

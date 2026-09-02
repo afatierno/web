@@ -5,10 +5,51 @@ const HTML5_QRCODE_URL =
 let html5QrcodeLoader_ = null;
 
 export function isScannerSupported() {
+  if (!window.isSecureContext) {
+    return false;
+  }
+
   return (
     typeof navigator.mediaDevices !== "undefined" &&
     typeof navigator.mediaDevices.getUserMedia === "function"
   );
+}
+
+async function requestVideoStream_() {
+  const attempts = [
+    {
+      audio: false,
+      video: {
+        facingMode: { ideal: "environment" },
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+      },
+    },
+    {
+      audio: false,
+      video: {
+        facingMode: "user",
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+      },
+    },
+    {
+      audio: false,
+      video: true,
+    },
+  ];
+
+  let lastError = null;
+
+  for (let i = 0; i < attempts.length; i++) {
+    try {
+      return await navigator.mediaDevices.getUserMedia(attempts[i]);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError || new Error("No se pudo acceder a ninguna cámara");
 }
 
 function canUseNativeBarcode_() {
@@ -87,14 +128,7 @@ export function createQrScanner(options) {
     onStatus("Solicitando acceso a la cámara…");
 
     detector = new BarcodeDetector({ formats: ["qr_code"] });
-    stream = await navigator.mediaDevices.getUserMedia({
-      audio: false,
-      video: {
-        facingMode: { ideal: "environment" },
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-      },
-    });
+    stream = await requestVideoStream_();
 
     video.srcObject = stream;
     await video.play();
@@ -141,31 +175,37 @@ export function createQrScanner(options) {
     active = true;
     onStatus("Solicitando acceso a la cámara…");
 
-    await html5QrCode.start(
-      { facingMode: "environment" },
-      {
-        fps: 10,
-        qrbox: function (viewfinderWidth, viewfinderHeight) {
-          const edge = Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.72);
-          return { width: edge, height: edge };
-        },
+    const scanConfig = {
+      fps: 10,
+      qrbox: function (viewfinderWidth, viewfinderHeight) {
+        const edge = Math.floor(Math.min(viewfinderWidth, viewfinderHeight) * 0.72);
+        return { width: edge, height: edge };
       },
-      async function (decodedText) {
-        const value = String(decodedText || "").trim();
+    };
 
-        if (!value || !active) {
-          return;
-        }
-
-        onStatus("Código detectado. Comprobando…");
-        await stop();
-        onScan(value);
-      },
-      function () {}
-    );
+    try {
+      await html5QrCode.start({ facingMode: { ideal: "environment" } }, scanConfig, onDecoded_, noopFrame_);
+    } catch (error) {
+      await html5QrCode.start({ facingMode: "user" }, scanConfig, onDecoded_, noopFrame_);
+    }
 
     onStatus("Apunta al código QR del carnet");
   }
+
+  function onDecoded_(decodedText) {
+    const value = String(decodedText || "").trim();
+
+    if (!value || !active) {
+      return;
+    }
+
+    onStatus("Código detectado. Comprobando…");
+    stop().then(function () {
+      onScan(value);
+    });
+  }
+
+  function noopFrame_() {}
 
   async function start() {
     if (active) {
