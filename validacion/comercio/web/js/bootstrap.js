@@ -17,18 +17,13 @@ async function fetchDeployVersion_(cacheBust) {
 
 function applyDeployVersion_(version, cacheBust) {
   const stylesheet = document.getElementById("app-stylesheet");
-  const versionLabel = document.getElementById("app-version");
   const query = "v=" + encodeURIComponent(version) + "&b=" + encodeURIComponent(String(cacheBust));
 
   if (stylesheet) {
     stylesheet.href = "css/styles.css?" + query;
   }
 
-  if (versionLabel) {
-    versionLabel.textContent = "v" + version;
-  }
-
-  document.title = "Validación comercio v" + version;
+  document.title = "Validación comercio";
 
   return query;
 }
