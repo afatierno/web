@@ -4,6 +4,9 @@ const UUID_V4_REGEX =
 const CONFIG_PARAM = "c";
 const SESSION_KEY = "afa.comercio.access";
 
+/** Pon true cuando quieras exigir enlace ?c= de comercio. */
+export const REQUIRE_MERCHANT_ACCESS = false;
+
 export const OFFICIAL_DOMAIN = "afatierno.github.io";
 export const OFFICIAL_VALIDATION_PATH = "/web/carnet/web/validacion.html";
 export const CERTIFIED_PDF_URL =
@@ -117,9 +120,16 @@ const parsed = CONFIG_PENDING_REDIRECT
     ? { error: bootstrapConfigError_ }
     : parseMerchantAccessConfig(loadEncodedConfig());
 
+let configError = parsed.error || null;
+let config = parsed.config || null;
+
+if (!REQUIRE_MERCHANT_ACCESS) {
+  configError = null;
+}
+
 export { CONFIG_PENDING_REDIRECT };
-export const CONFIG_ERROR = parsed.error || null;
-export const CONFIG = parsed.config || null;
+export const CONFIG_ERROR = configError;
+export const CONFIG = config;
 
 export function encodeAccessConfig(uuid, apiUrl) {
   return btoa(uuid + "|" + apiUrl);

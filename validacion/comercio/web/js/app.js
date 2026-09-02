@@ -4,10 +4,11 @@ import {
   CONFIG,
   CONFIG_ERROR,
   CONFIG_PENDING_REDIRECT,
-} from "./config.js?v=0002";
-import { parseValidationQrPayload } from "./qr-parser.js?v=0002";
-import { fetchValidation } from "./validation-api.js?v=0002";
-import { createQrScanner, isScannerSupported } from "./scanner.js?v=0002";
+  REQUIRE_MERCHANT_ACCESS,
+} from "./config.js?v=0003";
+import { parseValidationQrPayload } from "./qr-parser.js?v=0003";
+import { fetchValidation } from "./validation-api.js?v=0003";
+import { createQrScanner, isScannerSupported } from "./scanner.js?v=0003";
 
 const scannerSection = document.getElementById("scanner-section");
 const scannerViewport = document.getElementById("scanner-viewport");
@@ -173,9 +174,15 @@ async function validateRawInput(rawInput) {
 }
 
 function initMerchantPortal() {
-  if (CONFIG_ERROR || !CONFIG) {
+  if (REQUIRE_MERCHANT_ACCESS && (CONFIG_ERROR || !CONFIG)) {
     scannerSection.hidden = true;
     showError(CONFIG_ERROR || "Enlace de comercio no válido");
+    return;
+  }
+
+  if (CONFIG_ERROR) {
+    scannerSection.hidden = true;
+    showError(CONFIG_ERROR);
     return;
   }
 
