@@ -1,7 +1,11 @@
-import {
-  OFFICIAL_DOMAIN,
-  OFFICIAL_VALIDATION_PATH,
-} from "./config.js?v=0008";
+const moduleParams_ = new URL(import.meta.url).searchParams;
+const moduleQuery_ =
+  "v=" +
+  encodeURIComponent(moduleParams_.get("v") || "") +
+  "&b=" +
+  encodeURIComponent(moduleParams_.get("b") || String(Date.now()));
+
+const { OFFICIAL_DOMAIN, OFFICIAL_VALIDATION_PATH } = await import("./config.js?" + moduleQuery_);
 
 const UUID_V4_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;

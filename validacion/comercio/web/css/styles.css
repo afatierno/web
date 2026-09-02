@@ -177,6 +177,7 @@ body {
   background: var(--accent);
   color: #fff;
   text-decoration: none;
+  touch-action: manipulation;
 }
 
 .primary-button:hover,
