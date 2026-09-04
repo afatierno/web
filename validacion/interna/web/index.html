@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="theme-color" content="#ffffff">
+  <title>Validación interna</title>
+  <link id="app-stylesheet" rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main class="page validation-page">
+    <header class="page-header">
+      <p class="page-eyebrow">AMPA/AFA Enrique Tierno Galván</p>
+      <h1>Validación interna</h1>
+      <p id="access-label" class="access-label" hidden>
+        Acceso autorizado: <strong id="access-user"></strong>
+      </p>
+      <p class="access-notice">
+        Herramienta interna del AFA. Si ya diste permiso de cámara, el escáner se abrirá solo.
+      </p>
+    </header>
+
+    <section id="scanner-section" class="scanner-section" hidden>
+      <p class="scanner-intro">Escanea el código QR del carnet del socio.</p>
+      <div id="scanner-viewport" class="scanner-viewport" hidden>
+        <video id="scanner-video" class="scanner-video" playsinline muted aria-hidden="true"></video>
+        <div id="scanner-reader" class="scanner-reader" hidden></div>
+        <div class="scanner-frame" aria-hidden="true"></div>
+      </div>
+      <p id="scanner-status" class="scanner-status" aria-live="polite"></p>
+      <div class="scanner-actions">
+        <button id="toggle-scanner-button" type="button" class="primary-button">Permitir cámara y escanear</button>
+        <button id="scan-again-button" type="button" class="primary-button" hidden>Escanear otro</button>
+      </div>
+    </section>
+
+    <p id="status-message" class="status-message" aria-live="polite"></p>
+
+    <section id="result-card" class="result-card" hidden>
+      <div class="result-icon result-icon-valid" aria-hidden="true">✓</div>
+      <div class="result-icon result-icon-invalid" aria-hidden="true">✕</div>
+      <h2 id="result-title"></h2>
+      <p id="result-body" class="result-body" hidden></p>
+      <dl id="family-details" class="family-details"></dl>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.src = "js/vendor/html5-qrcode.min.js?b=" + Date.now();
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  </script>
+  <script type="module">
+    import("./js/bootstrap.js?b=" + Date.now());
+  </script>
+</body>
+</html>
