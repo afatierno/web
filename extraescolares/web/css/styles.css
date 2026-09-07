@@ -169,11 +169,30 @@ body {
   color: var(--text);
 }
 
+a.activity-name {
+  text-decoration: none;
+}
+
+a.activity-name:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
 .activity-meta {
   display: block;
   margin-top: 2px;
   color: var(--muted);
   font-size: 0.82rem;
+}
+
+.activity-meta .provider-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.activity-meta .provider-link:hover {
+  text-decoration: underline;
 }
 
 .info-card {
