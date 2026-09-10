@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Dosier comercios – Draft 1</title>
+  <link rel="stylesheet" href="css/dossier.css">
+  <style>
+    .shop-list {
+      display: grid;
+      gap: 14px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .shop-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px 16px;
+      align-items: start;
+      padding: 16px 18px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+    }
+
+    .shop-card h2 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+      line-height: 1.3;
+    }
+
+    .shop-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .shop-address {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .shop-note {
+      margin: 8px 0 0;
+      color: var(--text);
+      font-size: 0.88rem;
+    }
+
+    .shop-card aside {
+      text-align: right;
+    }
+
+    @media (max-width: 560px) {
+      .shop-card {
+        grid-template-columns: 1fr;
+      }
+
+      .shop-card aside {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <span class="draft-label">Draft 1 · Propuesta editorial</span>
+      <p class="page-eyebrow">AMPA/AFA Enrique Tierno Galván</p>
+      <h1>Dosier digital de comercios colaboradores</h1>
+      <p class="page-subtitle">CEIP Enrique Tierno Galván · Getafe · Borrador de diseño</p>
+    </header>
+
+    <ul class="shop-list">
+      <li class="shop-card">
+        <div>
+          <h2>Panadería La Espiga</h2>
+          <div class="shop-meta"><span class="type-badge">Panadería</span></div>
+          <p class="shop-address">C/ Madrid, 12 · Getafe</p>
+          <p class="shop-note">Descuento en bollería y pan del día presentando carnet de socio.</p>
+        </div>
+        <aside><span class="discount-badge">10% dto.</span></aside>
+      </li>
+      <li class="shop-card">
+        <div>
+          <h2>Librería El Tintero</h2>
+          <div class="shop-meta"><span class="type-badge">Librería</span></div>
+          <p class="shop-address">Av. de Getafe, 45 · Getafe</p>
+          <p class="shop-note">Aplica en material escolar y libros de texto no concertados.</p>
+        </div>
+        <aside><span class="discount-badge">5% dto.</span></aside>
+      </li>
+      <li class="shop-card">
+        <div>
+          <h2>Farmacia Tierno</h2>
+          <div class="shop-meta"><span class="type-badge">Farmacia</span></div>
+          <p class="shop-address">C/ Tierno Galván, 8 · Getafe</p>
+          <p class="shop-note">Válido en parafarmacia y dermocosmética seleccionada.</p>
+        </div>
+        <aside><span class="discount-badge">5% dto.</span></aside>
+      </li>
+      <li class="shop-card">
+        <div>
+          <h2>Peluquería Estilo Joven</h2>
+          <div class="shop-meta"><span class="type-badge">Peluquería</span></div>
+          <p class="shop-address">C/ Lisboa, 3 · Getafe</p>
+          <p class="shop-note">Incluye corte infantil y servicios de lavado básico.</p>
+        </div>
+        <aside><span class="discount-badge">10% dto.</span></aside>
+      </li>
+      <li class="shop-card">
+        <div>
+          <h2>Óptica Visión Clara</h2>
+          <div class="shop-meta"><span class="type-badge">Óptica</span></div>
+          <p class="shop-address">C/ Juan de la Cierva, 22 · Getafe</p>
+          <p class="shop-note">Descuento en monturas y revisiones visuales para socios.</p>
+        </div>
+        <aside><span class="discount-badge">10% dto.</span></aside>
+      </li>
+      <li class="shop-card">
+        <div>
+          <h2>Ferretería El Tornillo</h2>
+          <div class="shop-meta"><span class="type-badge">Ferretería</span></div>
+          <p class="shop-address">C/ Industria, 15 · Getafe</p>
+          <p class="shop-note">No acumulable con otras promociones de la tienda.</p>
+        </div>
+        <aside><span class="discount-badge">5% dto.</span></aside>
+      </li>
+      <li class="shop-card">
+        <div>
+          <h2>Restaurante La Parra</h2>
+          <div class="shop-meta"><span class="type-badge">Restaurante</span></div>
+          <p class="shop-address">C/ Alcalá, 88 · Getafe</p>
+          <p class="shop-note">Menú infantil y consumo en sala de lunes a jueves.</p>
+        </div>
+        <aside><span class="discount-badge">10% dto.</span></aside>
+      </li>
+      <li class="shop-card">
+        <div>
+          <h2>Papelería Scribo</h2>
+          <div class="shop-meta"><span class="type-badge">Papelería</span></div>
+          <p class="shop-address">C/ Toledo, 7 · Getafe</p>
+          <p class="shop-note">Material escolar, fotocopias y encuadernación sencilla.</p>
+        </div>
+        <aside><span class="discount-badge">5% dto.</span></aside>
+      </li>
+      <li class="shop-card">
+        <div>
+          <h2>Clínica Dental Sonrisa</h2>
+          <div class="shop-meta"><span class="type-badge">Clínica dental</span></div>
+          <p class="shop-address">Av. de España, 30 · Getafe</p>
+          <p class="shop-note">Primera revisa y limpieza básica para familias socias.</p>
+        </div>
+        <aside><span class="discount-badge">10% dto.</span></aside>
+      </li>
+      <li class="shop-card">
+        <div>
+          <h2>Tienda de Mascotas Huellas</h2>
+          <div class="shop-meta"><span class="type-badge">Tienda de mascotas</span></div>
+          <p class="shop-address">C/ Real, 19 · Getafe</p>
+          <p class="shop-note">Alimentación y accesorios para perros y gatos.</p>
+        </div>
+        <aside><span class="discount-badge">5% dto.</span></aside>
+      </li>
+    </ul>
+  </main>
+</body>
+</html>
