@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Baloncesto · Escuela de Baloncesto de Getafe</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .action-button {
+      display: inline-block;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .info-card .action-button-primary,
+    .info-card .action-button-primary:hover {
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .info-card .action-button-primary .action-button-desc {
+      color: #fff;
+    }
+
+    .info-card .action-button-secondary,
+    .info-card .action-button-secondary:hover {
+      background: #fff;
+      color: var(--accent);
+      border: 1px solid var(--border);
+      text-decoration: none;
+    }
+
+    .info-card .action-button:hover {
+      filter: brightness(1.05);
+    }
+
+    .action-button-desc {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      opacity: 0.92;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <p class="page-eyebrow">AMPA/AFA Enrique Tierno Galván</p>
+      <h1>Baloncesto · Escuela de Baloncesto de Getafe</h1>
+      <p class="page-subtitle">Extraescolar · Pista Grande · Lunes y miércoles · Primaria</p>
+    </header>
+
+    <section class="info-card" aria-labelledby="baloncesto-links-title">
+      <h2 id="baloncesto-links-title" class="section-title">Inscripción e información</h2>
+      <p>Para solicitar plaza, usa el formulario oficial. En el folleto encontrarás ubicaciones, precios, horarios y categorías.</p>
+      <p>En el formulario, la opción <strong>CEIP Enrique Tierno Galván</strong> está reservada a alumnos del AMPA/AFA.</p>
+
+      <div class="action-buttons">
+        <a class="action-button action-button-primary" href="https://docs.google.com/forms/d/e/1FAIpQLSceg6Xl2ARvjr4U2x4T3WbHLZBq8STsx43-nAC5boaLqFgDxA/viewform" target="_blank" rel="noopener noreferrer">
+          Solicitar plaza
+          <span class="action-button-desc">Formulario de inscripción · Temporada 2026-27</span>
+        </a>
+        <a class="action-button action-button-secondary" href="assets/pdf/escuela-baloncesto-getafe.pdf" target="_blank" rel="noopener noreferrer">
+          Ver folleto
+          <span class="action-button-desc">Información de escuelas, precios y horarios</span>
+        </a>
+      </div>
+    </section>
+
+    <p class="page-subtitle"><a href="index.html">← Volver a extraescolares</a></p>
+  </main>
+</body>
+</html>

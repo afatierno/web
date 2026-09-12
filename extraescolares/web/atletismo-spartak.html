@@ -6,6 +6,51 @@
   <meta name="theme-color" content="#ffffff">
   <title>Inscripción Atletismo · Spartak Getafe</title>
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .mailto-button,
+    .copy-button {
+      display: inline-block;
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-decoration: none;
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .info-card .mailto-button,
+    .info-card .mailto-button:hover {
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .copy-button {
+      background: #fff;
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+
+    .mailto-button:hover,
+    .copy-button:hover {
+      filter: brightness(1.05);
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 16px 0 8px;
+    }
+
+    .copy-status {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 0.88rem;
+      min-height: 1.3em;
+    }
+  </style>
 </head>
 <body>
   <main class="page">
@@ -18,8 +63,16 @@
     <section class="info-card" aria-labelledby="inscripcion-title">
       <h2 id="inscripcion-title" class="section-title">Cómo apuntarse</h2>
       <p>Para inscribirse, envía un correo electrónico a
-        <a href="mailto:clubspartakgetafe@gmail.com">clubspartakgetafe@gmail.com</a>
-        con la siguiente información:</p>
+        <a id="mailto-text-link" href="#">clubspartakgetafe@gmail.com</a>.
+        Al pulsar, se abrirá tu programa de correo con una plantilla ya preparada.</p>
+
+      <div class="action-buttons">
+        <a id="mailto-button-link" class="mailto-button" href="#">Abrir correo con plantilla</a>
+        <button id="copy-template" class="copy-button" type="button">Copiar plantilla</button>
+      </div>
+      <p id="copy-status" class="copy-status" aria-live="polite"></p>
+
+      <p>Incluye esta información:</p>
       <ul class="info-list">
         <li>Nombre y apellidos</li>
         <li>Fecha de nacimiento</li>
@@ -38,5 +91,44 @@
 
     <p class="page-subtitle"><a href="index.html">← Volver a extraescolares</a></p>
   </main>
+
+  <script>
+    (function () {
+      const to = "clubspartakgetafe@gmail.com";
+      const subject = "Inscripción atletismo";
+      const body =
+        "Hola,\n\n" +
+        "Solicito la inscripción en la actividad de atletismo con los siguientes datos:\n\n" +
+        "Nombre y apellidos: \n" +
+        "Fecha de nacimiento: \n" +
+        "DNI (del niñ@ o de un progenitor; indicar de quién si no es del niñ@): \n" +
+        "Domicilio: \n" +
+        "Correo electrónico: \n" +
+        "Teléfono: \n" +
+        "Número de socio del AMPA: \n\n" +
+        "Un saludo.";
+
+      const mailtoHref =
+        "mailto:" + to + "?" + new URLSearchParams({ subject: subject, body: body }).toString();
+
+      document.getElementById("mailto-text-link").href = mailtoHref;
+      document.getElementById("mailto-button-link").href = mailtoHref;
+
+      document.getElementById("copy-template").addEventListener("click", function () {
+        const status = document.getElementById("copy-status");
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(body).then(function () {
+            status.textContent = "Cuerpo del correo copiado. Pégalo en un mensaje a " + to + ".";
+          }).catch(function () {
+            status.textContent = "No se pudo copiar. Prueba «Abrir correo con plantilla».";
+          });
+          return;
+        }
+
+        status.textContent = "No se pudo copiar. Prueba «Abrir correo con plantilla».";
+      });
+    })();
+  </script>
 </body>
 </html>
