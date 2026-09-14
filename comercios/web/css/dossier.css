@@ -118,6 +118,16 @@ body {
   inset: 0;
 }
 
+.address-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.address-link:hover {
+  text-decoration: underline;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

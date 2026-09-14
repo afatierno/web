@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Dosier de comercios colaboradores</title>
+  <link rel="stylesheet" href="css/dossier.css">
+  <style>
+    .category-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 20px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .category-filters li {
+      margin: 0;
+      padding: 0;
+    }
+
+    .category-filter {
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .category-filter.is-active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .shop-grid > li {
+      margin: 0;
+      padding: 0;
+    }
+
+    .shop-grid > li[hidden] {
+      display: none;
+    }
+
+    .shop-tile {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .shop-tile:hover,
+    .shop-tile:focus-within {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .shop-tile-image {
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 55%, #e5e7eb 100%);
+      color: #9ca3af;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .shop-tile-image img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    .shop-tile-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 8px;
+      padding: 14px;
+    }
+
+    .shop-tile-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .shop-tile-header h2 {
+      margin: 0;
+      flex: 1;
+      min-width: 0;
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+
+    .shop-tile-link {
+      flex-shrink: 0;
+      font-size: 0.78rem;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+
+    .shop-tile-body p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .shop-tile-offers {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 4px;
+      margin-top: auto;
+      min-width: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .shop-tile-offers::-webkit-scrollbar {
+      display: none;
+    }
+
+    .shop-tile-offers .discount-badge {
+      flex-shrink: 0;
+      white-space: nowrap;
+      font-size: 0.72rem;
+      line-height: 1.25;
+      padding: 3px 8px;
+    }
+
+    .filter-empty {
+      margin: 0 0 16px;
+      padding: 24px 16px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.92rem;
+    }
+
+    .filter-empty[hidden] {
+      display: none;
+    }
+
+    @media (max-width: 560px) {
+      .shop-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <p class="page-eyebrow">AMPA/AFA Enrique Tierno Galván</p>
+      <h1>Dosier digital de comercios colaboradores</h1>
+      <p class="page-subtitle">Pulsa cualquier comercio para abrir su ficha.</p>
+    </header>
+
+    <ul class="category-filters" aria-label="Filtrar comercios">
+      <li><button type="button" class="category-filter is-active" data-filter="todo">Todo</button></li>
+      <li><button type="button" class="category-filter" data-filter="ocio">Ocio</button></li>
+      <li><button type="button" class="category-filter" data-filter="salud">Salud</button></li>
+      <li><button type="button" class="category-filter" data-filter="extraescolares">Extraescolares</button></li>
+      <li><button type="button" class="category-filter" data-filter="compras">Compras</button></li>
+    </ul>
+
+    <p id="filter-empty" class="filter-empty" hidden>No hay comercios en esta categoría.</p>
+
+    <ul class="shop-grid" id="shop-grid">
+      <li data-category="compras">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Aula 7</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Aula 7</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Tienda de música</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">10% de descuento</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="salud">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="centro-optico-lookvision.html"><span class="sr-only">Ver Centro Óptico Look Visión</span></a>
+          <div class="shop-tile-image">
+            <img src="assets/images/centro-optico-lookvision.jpg" alt="">
+          </div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Centro Óptico Look Visión</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Óptica</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">10% de descuento</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="extraescolares">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Club de lectura</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Club de lectura</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Actividad</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">Descuentos exclusivos de socios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="ocio">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver DIVERJUMP Leganés</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>DIVERJUMP Leganés</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Parque de trampolines</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">10% en determinados servicios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="extraescolares">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Escritura creativa y Oratoria</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Escritura creativa y Oratoria</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Teatro</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">Descuentos exclusivos de socios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="salud">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Fisioterapia Getafe</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Fisioterapia Getafe · Álvaro García</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Fisioterapia</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">Descuentos exclusivos de socios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="ocio">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Hop Galaxy Boadilla</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Hop Galaxy Boadilla</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Parque de ocio</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">Descuentos exclusivos de socios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="extraescolares">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Indoorwall Getafe</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Indoorwall Getafe</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Rocódromo</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">Descuentos exclusivos de socios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="ocio">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver JumpYard Getafe</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>JumpYard Getafe</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Parque de trampolines</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">Descuentos exclusivos de socios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="ocio">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Legapark</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Legapark</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Local de ocio</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">10% en determinados servicios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="salud">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Clínica Delta Loyola</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Clínica Delta Loyola</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Clínica dental</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">5% de descuento</span>
+              <span class="discount-badge">Descuentos exclusivos de socios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="ocio">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Mundifantasía</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Mundifantasía</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Local de ocio</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">10% en determinados servicios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="ocio">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Ohana Acai Getafe</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Ohana Acai Getafe</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Cafetería</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">10% de descuento</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="compras">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Papelería y Librería Los Colegios</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Papelería y Librería Los Colegios</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Librería</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">5-10% en determinados artículos</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="ocio">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Periko mucho</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Periko mucho</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Local de eventos</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">5% en determinados servicios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="ocio">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Planeta Estrella</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Planeta Estrella</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Local de ocio</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">10% en determinados servicios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="ocio">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Rey de Pikas</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Rey de Pikas</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Ocio</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">Descuentos exclusivos de socios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="ocio">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Un sitio muy chulo</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Un sitio muy chulo</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Local de eventos</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">10% en determinados servicios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+
+      <li data-category="ocio">
+        <article class="shop-tile">
+          <a class="stretch-link text-link" href="en-construccion.html"><span class="sr-only">Ver Urban Planet</span></a>
+          <div class="shop-tile-image" aria-hidden="true">Imagen</div>
+          <div class="shop-tile-body">
+            <div class="shop-tile-header">
+              <h2>Urban Planet</h2>
+              <span class="text-link shop-tile-link" aria-hidden="true">Ver ficha →</span>
+            </div>
+            <p><span class="type-badge">Parque de trampolines</span></p>
+            <div class="shop-tile-offers">
+              <span class="discount-badge">10-15% en determinados servicios</span>
+            </div>
+          </div>
+        </article>
+      </li>
+    </ul>
+  </main>
+
+  <script>
+    (function () {
+      var filters = document.querySelectorAll(".category-filter");
+      var items = document.querySelectorAll("#shop-grid > li");
+      var emptyMessage = document.getElementById("filter-empty");
+
+      function applyFilter(category) {
+        var visibleCount = 0;
+
+        items.forEach(function (item) {
+          var show = category === "todo" || item.dataset.category === category;
+          item.hidden = !show;
+          if (show) visibleCount += 1;
+        });
+
+        emptyMessage.hidden = visibleCount > 0;
+      }
+
+      filters.forEach(function (button) {
+        button.addEventListener("click", function () {
+          filters.forEach(function (btn) {
+            btn.classList.toggle("is-active", btn === button);
+          });
+          applyFilter(button.dataset.filter);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

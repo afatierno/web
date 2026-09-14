@@ -39,8 +39,20 @@
     <section class="stub-card" aria-labelledby="stub-title">
       <h2 id="stub-title">Página en construcción</h2>
       <p>Aquí irá la información ampliada del comercio, condiciones del descuento y datos de contacto.</p>
-      <a class="text-link" href="dossier-draft2.html">← Volver al dosier</a>
+      <a class="text-link" id="back-link" href="index.html">← Volver al dosier</a>
     </section>
   </main>
+
+  <script>
+    document.getElementById("back-link").addEventListener("click", function (event) {
+      event.preventDefault();
+      var referrer = document.referrer;
+      if (referrer && new URL(referrer).origin === location.origin) {
+        history.back();
+      } else {
+        location.href = "index.html";
+      }
+    });
+  </script>
 </body>
 </html>
