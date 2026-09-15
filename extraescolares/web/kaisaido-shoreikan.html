@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Kaisaido · Escuela de Artes Orientales Shoreikan</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .action-button {
+      display: inline-block;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .info-card .action-button-primary,
+    .info-card .action-button-primary:hover {
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .info-card .action-button-primary .action-button-desc {
+      color: #fff;
+    }
+
+    .info-card .action-button-secondary,
+    .info-card .action-button-secondary:hover {
+      background: #fff;
+      color: var(--accent);
+      border: 1px solid var(--border);
+      text-decoration: none;
+    }
+
+    .info-card .action-button:hover {
+      filter: brightness(1.05);
+    }
+
+    .action-button-desc {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      opacity: 0.92;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <p class="page-eyebrow">AMPA/AFA Enrique Tierno Galván</p>
+      <h1>Kaisaido · Escuela de Artes Orientales Shoreikan</h1>
+      <p class="page-subtitle">Extraescolar · Gimnasio · Martes y jueves · 5 años a Primaria</p>
+    </header>
+
+    <section class="info-card" aria-labelledby="kaisaido-links-title">
+      <h2 id="kaisaido-links-title" class="section-title">Reserva de plaza e información</h2>
+      <p>Para solicitar plaza, usa el formulario oficial del Centro de Artes Orientales de Getafe Shoreikan.</p>
+      <p>La reserva es gratuita y sin compromiso. Puedes asistir a una clase de prueba antes de formalizar la inscripción.</p>
+
+      <div class="action-buttons">
+        <a class="action-button action-button-primary" href="https://forms.gle/CarYWc9G4PZBNVGX7" target="_blank" rel="noopener noreferrer">
+          Solicitar plaza
+          <span class="action-button-desc">Formulario de reserva · Curso 2026-27</span>
+        </a>
+        <a class="action-button action-button-secondary" href="assets/images/kaisaido-shoreikan.png" target="_blank" rel="noopener noreferrer">
+          Ver cartel
+          <span class="action-button-desc">Horarios, grupos y actividades</span>
+        </a>
+      </div>
+    </section>
+
+    <p class="page-subtitle"><a href="index.html">← Volver a extraescolares</a></p>
+  </main>
+</body>
+</html>
