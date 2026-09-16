@@ -109,7 +109,9 @@
         "Un saludo.";
 
       const mailtoHref =
-        "mailto:" + to + "?" + new URLSearchParams({ subject: subject, body: body }).toString();
+        "mailto:" + to +
+        "?subject=" + encodeURIComponent(subject) +
+        "&body=" + encodeURIComponent(body);
 
       document.getElementById("mailto-text-link").href = mailtoHref;
       document.getElementById("mailto-button-link").href = mailtoHref;
