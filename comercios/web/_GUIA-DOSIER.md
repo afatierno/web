@@ -11,6 +11,8 @@ Documento de referencia para mantener y ampliar el dosier (`index.html`, fichas 
 | `index.html` | Página principal: cuadrícula 2 columnas, filtros y tarjetas |
 | `en-construccion.html` | Ficha genérica mientras no exista página propia |
 | `centro-optico-lookvision.html` | Ejemplo de ficha completa con texto ampliado |
+| `fisioterapia-alvaro-garcia.html` | Ficha completa de Fisioterapia Álvaro García |
+| `un-sitio-muy-chulo.html` | Ficha completa de Un sitio muy chulo |
 | `css/dossier.css` | Estilos compartidos (badges, tipografía, layout base) |
 
 ---
@@ -70,7 +72,7 @@ Cuando el descuento es parcial (cumpleaños, ciertos días, cafetería, salto, e
 - `X% en determinados servicios` — ocio, eventos, actividades, tratamientos acotados
 - `X% en determinados artículos` — tiendas, librerías, papelería, productos físicos
 
-**Ejemplos:** Periko mucho (5% cumpleaños/eventos), Legapark, DIVERJUMP, Un sitio muy chulo.
+**Ejemplos:** Pekiro mucho (5% cumpleaños/eventos), Legapark, DIVERJUMP, Un sitio muy chulo.
 
 ### 3. Varios porcentajes distintos
 
@@ -80,7 +82,7 @@ Mostrar el **rango** mínimo–máximo, no listar cada uno en la tarjeta.
 - `5-10% en determinados artículos`
 - `10-15% en determinados servicios`
 
-**Ejemplos:** Papelería Los Colegios (5% libros / 10% papelería), Urban Planet (10% salto / 15% cumples).
+**Ejemplos:** Papelería Los Colegios (5% libros / 10% papelería), Urban Planet (10% salto / 15% cumples), Fisioterapia Álvaro García (10% fisioterapia / 20% menores de 14).
 
 ### 4. Ventajas que no son porcentaje
 
@@ -88,7 +90,7 @@ Precios especiales, clases gratis, matrícula gratis, consumiciones, etc.
 
 **Formato:** `Descuentos exclusivos de socios`
 
-**Ejemplos:** Indoorwall, JumpYard, Club de lectura, Fisioterapia Getafe, Rey de Pikas.
+**Ejemplos:** Indoorwall, JumpYard, Club de lectura, Rey de Pikas.
 
 ### 5. Combinar porcentaje + otras ventajas
 
@@ -98,7 +100,7 @@ Si hay porcentaje **y** ventajas no porcentuales (revisiones gratis, TAC gratis,
 1. `X% de descuento`
 2. `Descuentos exclusivos de socios`
 
-**Ejemplo:** Clínica Delta Loyola (5% + revisiones/radiografías/TAC gratis).
+**Ejemplo:** Clínica Dental Loyola (5% + revisiones/radiografías/TAC gratis).
 
 ---
 
@@ -139,22 +141,22 @@ Si hay porcentaje **y** ventajas no porcentuales (revisiones gratis, TAC gratis,
 |----------|-----------|-----------------|-------|
 | Aula 7 | compras | 10% de descuento | en-construccion |
 | Centro Óptico Look Visión | salud | 10% de descuento | centro-optico-lookvision.html |
+| Clínica Dental Loyola | salud | 5% de descuento + Descuentos exclusivos de socios | en-construccion |
 | Club de lectura | extraescolares | Descuentos exclusivos de socios | en-construccion |
 | DIVERJUMP Leganés | ocio | 10% en determinados servicios | en-construccion |
 | Escritura creativa y Oratoria | extraescolares | Descuentos exclusivos de socios | en-construccion |
-| Fisioterapia Getafe · Álvaro García | salud | Descuentos exclusivos de socios | en-construccion |
+| Fisioterapia Getafe · Álvaro García | salud | 10-20% en determinados servicios | fisioterapia-alvaro-garcia.html |
 | Hop Galaxy Boadilla | ocio | Descuentos exclusivos de socios | en-construccion |
 | Indoorwall Getafe | extraescolares | Descuentos exclusivos de socios | en-construccion |
 | JumpYard Getafe | ocio | Descuentos exclusivos de socios | en-construccion |
 | Legapark | ocio | 10% en determinados servicios | en-construccion |
-| Clínica Delta Loyola | salud | 5% de descuento + Descuentos exclusivos de socios | en-construccion |
 | Mundifantasía | ocio | 10% en determinados servicios | en-construccion |
 | Ohana Acai Getafe | ocio | 10% de descuento | en-construccion |
 | Papelería y Librería Los Colegios | compras | 5-10% en determinados artículos | en-construccion |
-| Periko mucho | ocio | 5% en determinados servicios | en-construccion |
+| Pekiro mucho | ocio | 5% en cumpleaños y eventos | pekiro-mucho.html |
 | Planeta Estrella | ocio | 10% en determinados servicios | en-construccion |
 | Rey de Pikas | ocio | Descuentos exclusivos de socios | en-construccion |
-| Un sitio muy chulo | ocio | 10% en determinados servicios | en-construccion |
+| Un sitio muy chulo | ocio | 10% en determinados servicios | un-sitio-muy-chulo.html |
 | Urban Planet | ocio | 10-15% en determinados servicios | en-construccion |
 
 ---
