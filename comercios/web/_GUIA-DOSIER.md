@@ -27,9 +27,9 @@ Documento de referencia para mantener y ampliar el dosier (`index.html`, fichas 
 | Filtro | `data-category` | Ejemplos |
 |--------|-----------------|----------|
 | Todo | (sin filtrar) | — |
-| Ocio | `ocio` | Parques, eventos, cafeterías de ocio |
+| Ocio | `ocio` | Rocódromo, cafeterías |
+| Locales y actividades | `locales-actividades` | Parques infantiles, trampolines, locales de eventos, cumpleaños |
 | Salud | `salud` | Dental, óptica, fisioterapia |
-| Extraescolares | `extraescolares` | Rocódromo, club de lectura, oratoria |
 | Compras | `compras` | Librería, papelería, tienda de música |
 
 ---
@@ -90,7 +90,7 @@ Precios especiales, clases gratis, matrícula gratis, consumiciones, etc.
 
 **Formato:** `Descuentos exclusivos de socios`
 
-**Ejemplos:** Indoorwall, JumpYard, Club de lectura, Rey de Pikas.
+**Ejemplos:** Indoorwall, JumpYard, Rey de Pikas.
 
 ### 5. Combinar porcentaje + otras ventajas
 
@@ -127,7 +127,7 @@ Si hay porcentaje **y** ventajas no porcentuales (revisiones gratis, TAC gratis,
 
 ## Añadir un comercio nuevo (checklist)
 
-1. Decidir categoría (`ocio`, `salud`, `extraescolares`, `compras`).
+1. Decidir categoría (`ocio`, `locales-actividades`, `salud`, `compras`).
 2. Insertar la tarjeta en **orden alfabético** en `#shop-grid`.
 3. Elegir el texto del badge según las reglas de arriba.
 4. Si el descuento es complejo, crear ficha propia; si no, enlazar a `en-construccion.html`.
@@ -139,25 +139,23 @@ Si hay porcentaje **y** ventajas no porcentuales (revisiones gratis, TAC gratis,
 
 | Comercio | Categoría | Badge en dosier | Ficha |
 |----------|-----------|-----------------|-------|
-| Aula 7 | compras | 10% de descuento | en-construccion |
+| Aula 7 | compras | 10% de descuento | aula-7.html |
 | Centro Óptico Look Visión | salud | 10% de descuento | centro-optico-lookvision.html |
-| Clínica Dental Loyola | salud | 5% de descuento + Descuentos exclusivos de socios | en-construccion |
-| Club de lectura | extraescolares | Descuentos exclusivos de socios | en-construccion |
-| DIVERJUMP Leganés | ocio | 10% en determinados servicios | en-construccion |
-| Escritura creativa y Oratoria | extraescolares | Descuentos exclusivos de socios | en-construccion |
+| Clínica Dental Loyola | salud | 5% de descuento + Descuentos exclusivos de socios | clinica-dental-loyola.html |
+| DIVERJUMP Leganés | locales-actividades | 10% en cumpleaños | diverjump-leganes.html |
 | Fisioterapia Getafe · Álvaro García | salud | 10-20% en determinados servicios | fisioterapia-alvaro-garcia.html |
-| Hop Galaxy Boadilla | ocio | Descuentos exclusivos de socios | en-construccion |
-| Indoorwall Getafe | extraescolares | Descuentos exclusivos de socios | en-construccion |
-| JumpYard Getafe | ocio | Descuentos exclusivos de socios | en-construccion |
-| Legapark | ocio | 10% en determinados servicios | en-construccion |
-| Mundifantasía | ocio | 10% en determinados servicios | en-construccion |
-| Ohana Acai Getafe | ocio | 10% de descuento | en-construccion |
-| Papelería y Librería Los Colegios | compras | 5-10% en determinados artículos | en-construccion |
-| Pekiro mucho | ocio | 5% en cumpleaños y eventos | pekiro-mucho.html |
-| Planeta Estrella | ocio | 10% en determinados servicios | en-construccion |
-| Rey de Pikas | ocio | Descuentos exclusivos de socios | en-construccion |
-| Un sitio muy chulo | ocio | 10% en determinados servicios | un-sitio-muy-chulo.html |
-| Urban Planet | ocio | 10-15% en determinados servicios | en-construccion |
+| Hop Galaxy Boadilla | locales-actividades | 2 €/niño en grupos (lun-jue) | hop-galaxy-boadilla.html |
+| Indoorwall Getafe | ocio | Matrícula escuela gratis + Actividades 8,5 € niños | indoorwall-getafe.html |
+| JumpYard Getafe | locales-actividades | Cumpleañero gratis (cumpleaños) | jumpyard-getafe.html |
+| Legapark | locales-actividades | 10% en determinados servicios | legapark.html |
+| Mundifantasía | locales-actividades | 10% en determinados servicios | mundifantasia.html |
+| Ohana Acai Getafe | ocio | 10% de descuento | ohana-acai-getafe.html |
+| Papelería y Librería Los Colegios | compras | 5-10% en determinados artículos | papeleria-los-colegios.html |
+| Pekiro mucho | locales-actividades | 5% en cumpleaños y eventos | pekiro-mucho.html |
+| Planeta Estrella | locales-actividades | 10% en determinados servicios | planeta-estrella.html |
+| Rey de Pikas | ocio | 1 consumición gratis por entrada | rey-de-pikas.html |
+| Un sitio muy chulo | locales-actividades | 10% en determinados servicios | un-sitio-muy-chulo.html |
+| Urban Planet | locales-actividades | 10-15% en determinados servicios | urban-planet-leganes.html |
 
 ---
 

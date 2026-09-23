@@ -71,7 +71,7 @@ SCHEDULE = [
     ]),
     ("Aulas Primaria", [
         ["Inglés · P", "Teatro · I+P"],
-        ["Inglés · P", "Ajedrez M/J · P", "Club lectura · 3A-8A", "Homework · P", "Pintura · P"],
+        ["Inglés · P", "Ajedrez M/J · P", "Homework · P", "Pintura · P"],
         ["Inglés · P", "Oratoria · P", "Teatro · I+P"],
         ["Inglés · P", "Ajedrez M/J · P", "Homework · P", "Pintura · P"],
         ["Ajedrez V · P", "Informática/videojuegos · P"],
@@ -227,7 +227,7 @@ def build_pdf():
     legend = Paragraph(
         "<b>Leyenda:</b> I = Infantil · P = Primaria · I+P = Infantil y Primaria · "
         "2P-6P = 2.º a 6.º Primaria · 5A+P = Desde 5 años · "
-        "3A-8A = 3 a 8 años · M/J = Martes y jueves · V = Viernes &nbsp;|&nbsp; "
+        "M/J = Martes y jueves · V = Viernes &nbsp;|&nbsp; "
         "<b>Web:</b> afatierno.github.io/web/extraescolares/web/ &nbsp;|&nbsp; "
         "<b>Dudas:</b> ampa.etierno@gmail.com",
         foot_style,
