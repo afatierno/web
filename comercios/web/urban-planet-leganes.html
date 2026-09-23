@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>Urban Planet Leganés</title>
+  <link rel="stylesheet" href="css/dossier.css">
+  <style>
+    .ficha-hero {
+      margin-bottom: 24px;
+      padding: 20px 18px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: linear-gradient(180deg, var(--accent-soft) 0%, #fff 100%);
+      text-align: center;
+    }
+
+    .ficha-hero img {
+      display: block;
+      max-width: 280px;
+      width: 100%;
+      height: auto;
+      margin: 0 auto 16px;
+    }
+
+    .ficha-hero p {
+      margin: 0;
+      color: var(--text);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .ficha-section {
+      margin-bottom: 16px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+    }
+
+    .ficha-section h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      line-height: 1.35;
+      color: var(--accent);
+    }
+
+    .ficha-section p {
+      margin: 0;
+      color: var(--text);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .ficha-section ul {
+      margin: 10px 0 0;
+      padding-left: 1.2rem;
+      color: var(--text);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .ficha-section li + li {
+      margin-top: 4px;
+    }
+
+    .ficha-contact {
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 14px;
+      background: #f9fafb;
+      text-align: center;
+    }
+
+    .ficha-contact h2 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+    }
+
+    .ficha-contact p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .ficha-contact p + p {
+      margin-top: 8px;
+    }
+
+    .ficha-back {
+      display: inline-block;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <p class="page-eyebrow">AFA CEIP Enrique Tierno Galván de Getafe</p>
+      <h1>Urban Planet</h1>
+      <p class="page-subtitle"><span class="type-badge">Parque de trampolines</span></p>
+    </header>
+
+    <section class="ficha-hero" aria-label="Presentación">
+      <img src="assets/images/urban_palnet.jpg" alt="Urban Planet Leganés">
+      <p>Parque de camas elásticas en Leganés: salto, atracciones, cumpleaños y actividades para colegios en el Centro Comercial Sambil.</p>
+    </section>
+
+    <section class="ficha-section" aria-labelledby="afa-title">
+      <h2 id="afa-title">🤸 Ventajas para socios del AFA</h2>
+      <p>Los socios del AFA CEIP Enrique Tierno Galván de Getafe disfrutan de:</p>
+      <ul>
+        <li><strong>10% de descuento</strong> en salto</li>
+        <li><strong>15% de descuento</strong> en celebración de cumpleaños</li>
+      </ul>
+    </section>
+
+    <section class="ficha-contact" aria-labelledby="contacto-title">
+      <h2 id="contacto-title">📍 Urban Planet Leganés</h2>
+      <p>
+        <a class="address-link" href="https://www.google.com/maps/search/?api=1&amp;query=Urban+Planet+Legan%C3%A9s,+Centro+Comercial+Sambil+Outlet,+Calle+Mondrag%C3%B3n,+Legan%C3%A9s,+Madrid,+Espa%C3%B1a" target="_blank" rel="noopener noreferrer">
+          Centro Comercial Sambil Outlet, 1ª Planta · Calle Mondragón, s/n · Leganés
+        </a>
+      </p>
+      <p>
+        <a class="text-link" href="tel:+34914213071">914 21 30 71</a>
+      </p>
+      <p>
+        <a class="text-link" href="mailto:info.sambil@urbanplanetjump.es">info.sambil@urbanplanetjump.es</a>
+      </p>
+      <p>
+        <a class="text-link" href="https://urbanplanetjump.es/parques/leganes" target="_blank" rel="noopener noreferrer">urbanplanetjump.es/parques/leganes</a>
+      </p>
+    </section>
+
+    <p><a class="text-link ficha-back" id="back-link" href="index.html">← Volver al dosier</a></p>
+  </main>
+
+  <script>
+    document.getElementById("back-link").addEventListener("click", function (event) {
+      event.preventDefault();
+      var referrer = document.referrer;
+      if (referrer && new URL(referrer).origin === location.origin) {
+        history.back();
+      } else {
+        location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+</html>
