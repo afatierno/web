@@ -21,13 +21,14 @@ Documento de referencia para mantener y ampliar el dosier (`index.html`, fichas 
 
 - Mantener los comercios **ordenados alfabéticamente** por nombre en `index.html`.
 - Cada comercio va en un `<li data-category="…">` dentro de `#shop-grid`.
+- Al publicar cambios en el listado o filtros, actualizar la fecha al pie de `index.html` (`.dossier-updated`) y la línea final de esta guía.
 
 ### Categorías de filtro
 
 | Filtro | `data-category` | Ejemplos |
 |--------|-----------------|----------|
 | Todo | (sin filtrar) | — |
-| Cultura | `cultura` | Teatro, cafeterías |
+| Ocio y Cultura | `cultura` | Teatro, cafeterías |
 | Locales de actividades | `locales-actividades` | Rocódromo, parques infantiles, trampolines, cumpleaños |
 | Salud | `salud` | Dental, óptica, fisioterapia |
 | Compras | `compras` | Librería, papelería, tienda de música |
@@ -159,4 +160,4 @@ Si hay porcentaje **y** ventajas no porcentuales (revisiones gratis, TAC gratis,
 
 ---
 
-*Última actualización: septiembre 2026*
+*Última actualización: 24 de septiembre de 2026*
