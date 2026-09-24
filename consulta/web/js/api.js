@@ -1,5 +1,4 @@
 import { CONFIG } from "./config.js";
-import { requestCarnetApi } from "../../../carnet/web/js/api-url.js?v=0022";
 
 export function buildSearchUrl(query) {
   const baseUrl = CONFIG.API_URL.trim();
@@ -11,8 +10,17 @@ export function buildSearchUrl(query) {
 }
 
 export async function fetchSearch(query, signal) {
-  return requestCarnetApi(buildSearchUrl(query), signal, {
-    apiUrl: CONFIG.API_URL,
-    fallbackMessage: "La búsqueda falló",
-  });
+  const response = await fetch(buildSearchUrl(query), { signal });
+
+  if (!response.ok) {
+    throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+
+  if (!data.ok) {
+    throw new Error(data.error || "La búsqueda falló");
+  }
+
+  return data;
 }
