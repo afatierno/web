@@ -7,16 +7,16 @@ import {
   QR_DISPLAY_TTL_MS,
   QR_RELOAD_ICON_URL,
   QR_RELOAD_LABEL,
-} from "./config.js?v=0022";
+} from "./config.js?v=0023";
 import {
   buildCarnetFields,
   refitCarnetTypography,
   renderCarnetCard,
   renderInfoMessages,
   setStatusMessage,
-} from "./render.js?v=0022";
-import { fetchCarnet } from "./api.js?v=0022";
-import { buildValidationAccessUrl, clearValidationQrTimer, setupValidationQr } from "./qr.js?v=0022";
+} from "./render.js?v=0023";
+import { fetchCarnet } from "./api.js?v=0023";
+import { buildValidationAccessUrl, clearValidationQrTimer, setupValidationQr } from "./qr.js?v=0023";
 
 const UUID_V4_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -77,11 +77,13 @@ function showCarnet(data) {
   refitCarnetTypography(carnetContent);
 
   const validationToken = String(data.validationToken || "").trim();
+  const validationApiUrl =
+    String(data.validationApiUrl || "").trim() || (CONFIG ? CONFIG.API_URL : "");
 
-  if (validationToken && UUID_V4_REGEX.test(validationToken) && CONFIG) {
+  if (validationToken && UUID_V4_REGEX.test(validationToken) && CONFIG && validationApiUrl) {
     setupValidationQr(validationQr, validationQrValidity, {
       getValidationUrl: function () {
-        return buildValidationAccessUrl(validationToken, CONFIG.API_URL);
+        return buildValidationAccessUrl(validationToken, validationApiUrl);
       },
       ttlMs: QR_DISPLAY_TTL_MS,
       validityText: CARNET_VALIDITY_TEXT,
