@@ -1,4 +1,5 @@
-import { CONFIG } from "./validacion-config.js?v=0013";
+import { CONFIG } from "./validacion-config.js?v=0022";
+import { requestCarnetApi } from "./api-url.js?v=0022";
 
 function buildValidateUrl() {
   const baseUrl = CONFIG.API_URL.trim();
@@ -17,24 +18,8 @@ function buildValidateUrl() {
 }
 
 export async function fetchValidation(signal) {
-  const response = await fetch(buildValidateUrl(), {
-    signal: signal,
-    cache: "no-store",
+  return requestCarnetApi(buildValidateUrl(), signal, {
+    apiUrl: CONFIG.API_URL,
+    fallbackMessage: "No se pudo validar el carnet",
   });
-
-  if (!response.ok) {
-    throw new Error("Error HTTP " + response.status + ": " + response.statusText);
-  }
-
-  const data = await response.json();
-
-  if (!data || typeof data !== "object") {
-    throw new Error("La respuesta de validación no es válida");
-  }
-
-  if (!data.ok) {
-    throw new Error(data.error || "No se pudo validar el carnet");
-  }
-
-  return data;
 }
