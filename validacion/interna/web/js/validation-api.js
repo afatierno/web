@@ -1,3 +1,5 @@
+import { requestCarnetApi } from "../../../../carnet/web/js/api-url.js?v=0022";
+
 function buildValidateDetailUrl(config) {
   const baseUrl = config.API_URL.trim();
   const encodedUuid = encodeURIComponent(config.UUID);
@@ -15,24 +17,10 @@ function buildValidateDetailUrl(config) {
 }
 
 export async function fetchCarnetDetail(config, signal) {
-  const response = await fetch(buildValidateDetailUrl(config), {
-    signal: signal,
-    cache: "no-store",
+  const data = await requestCarnetApi(buildValidateDetailUrl(config), signal, {
+    apiUrl: config.API_URL,
+    fallbackMessage: "No se pudo validar el carnet",
   });
-
-  if (!response.ok) {
-    throw new Error("Error HTTP " + response.status + ": " + response.statusText);
-  }
-
-  const data = await response.json();
-
-  if (!data || typeof data !== "object") {
-    throw new Error("La respuesta de validación no es válida");
-  }
-
-  if (!data.ok) {
-    throw new Error(data.error || "No se pudo validar el carnet");
-  }
 
   if (!Array.isArray(data.headers) || !Array.isArray(data.values)) {
     throw new Error("La respuesta no incluye los datos de la familia");

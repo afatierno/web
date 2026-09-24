@@ -1,3 +1,5 @@
+import { validateCarnetApiUrl } from "./api-url.js?v=0022";
+
 const UUID_V4_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -101,10 +103,10 @@ function parseEncodedConfig(encoded) {
     return { error: "Falta la URL del script en el enlace" };
   }
 
-  try {
-    new URL(apiUrl);
-  } catch {
-    return { error: "La URL del script no es válida" };
+  const apiUrlError = validateCarnetApiUrl(apiUrl);
+
+  if (apiUrlError) {
+    return { error: apiUrlError };
   }
 
   return {

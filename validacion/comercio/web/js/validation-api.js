@@ -1,3 +1,5 @@
+import { requestCarnetApi } from "../../../../carnet/web/js/api-url.js?v=0022";
+
 function buildValidateUrl(config) {
   const baseUrl = config.API_URL.trim();
   const encodedUuid = encodeURIComponent(config.UUID);
@@ -15,24 +17,8 @@ function buildValidateUrl(config) {
 }
 
 export async function fetchValidation(config, signal) {
-  const response = await fetch(buildValidateUrl(config), {
-    signal: signal,
-    cache: "no-store",
+  return requestCarnetApi(buildValidateUrl(config), signal, {
+    apiUrl: config.API_URL,
+    fallbackMessage: "No se pudo validar el carnet",
   });
-
-  if (!response.ok) {
-    throw new Error("Error HTTP " + response.status + ": " + response.statusText);
-  }
-
-  const data = await response.json();
-
-  if (!data || typeof data !== "object") {
-    throw new Error("La respuesta de validación no es válida");
-  }
-
-  if (!data.ok) {
-    throw new Error(data.error || "No se pudo validar el carnet");
-  }
-
-  return data;
 }
