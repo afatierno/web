@@ -27,8 +27,8 @@ Documento de referencia para mantener y ampliar el dosier (`index.html`, fichas 
 | Filtro | `data-category` | Ejemplos |
 |--------|-----------------|----------|
 | Todo | (sin filtrar) | — |
-| Ocio | `ocio` | Rocódromo, cafeterías |
-| Locales y actividades | `locales-actividades` | Parques infantiles, trampolines, locales de eventos, cumpleaños |
+| Cultura | `cultura` | Teatro, cafeterías |
+| Locales de actividades | `locales-actividades` | Rocódromo, parques infantiles, trampolines, cumpleaños |
 | Salud | `salud` | Dental, óptica, fisioterapia |
 | Compras | `compras` | Librería, papelería, tienda de música |
 
@@ -127,7 +127,7 @@ Si hay porcentaje **y** ventajas no porcentuales (revisiones gratis, TAC gratis,
 
 ## Añadir un comercio nuevo (checklist)
 
-1. Decidir categoría (`ocio`, `locales-actividades`, `salud`, `compras`).
+1. Decidir categoría (`cultura`, `locales-actividades`, `salud`, `compras`).
 2. Insertar la tarjeta en **orden alfabético** en `#shop-grid`.
 3. Elegir el texto del badge según las reglas de arriba.
 4. Si el descuento es complejo, crear ficha propia; si no, enlazar a `en-construccion.html`.
@@ -145,15 +145,15 @@ Si hay porcentaje **y** ventajas no porcentuales (revisiones gratis, TAC gratis,
 | DIVERJUMP Leganés | locales-actividades | 10% en cumpleaños | diverjump-leganes.html |
 | Fisioterapia Getafe · Álvaro García | salud | 10-20% en determinados servicios | fisioterapia-alvaro-garcia.html |
 | Hop Galaxy Boadilla | locales-actividades | 2 €/niño en grupos (lun-jue) | hop-galaxy-boadilla.html |
-| Indoorwall Getafe | ocio | Matrícula escuela gratis + Actividades 8,5 € niños | indoorwall-getafe.html |
+| Indoorwall Getafe | locales-actividades | Matrícula escuela gratis + Actividades 8,5 € niños | indoorwall-getafe.html |
 | JumpYard Getafe | locales-actividades | Cumpleañero gratis (cumpleaños) | jumpyard-getafe.html |
 | Legapark | locales-actividades | 10% en determinados servicios | legapark.html |
 | Mundifantasía | locales-actividades | 10% en determinados servicios | mundifantasia.html |
-| Ohana Acai Getafe | ocio | 10% de descuento | ohana-acai-getafe.html |
+| Ohana Acai Getafe | cultura | 10% de descuento | ohana-acai-getafe.html |
 | Papelería y Librería Los Colegios | compras | 5-10% en determinados artículos | papeleria-los-colegios.html |
 | Pekiro mucho | locales-actividades | 5% en cumpleaños y eventos | pekiro-mucho.html |
 | Planeta Estrella | locales-actividades | 10% en determinados servicios | planeta-estrella.html |
-| Rey de Pikas | ocio | 1 consumición gratis por entrada | rey-de-pikas.html |
+| Rey de Pikas | cultura | 1 consumición gratis por entrada | rey-de-pikas.html |
 | Un sitio muy chulo | locales-actividades | 10% en determinados servicios | un-sitio-muy-chulo.html |
 | Urban Planet | locales-actividades | 10-15% en determinados servicios | urban-planet-leganes.html |
 
