@@ -146,8 +146,10 @@ Si hay porcentaje **y** ventajas no porcentuales (revisiones gratis, TAC gratis,
 | DIVERJUMP Leganés | locales-actividades | 10% en cumpleaños | diverjump-leganes.html |
 | Fisioterapia Getafe · Álvaro García | salud | 10-20% en determinados servicios | fisioterapia-alvaro-garcia.html |
 | Hop Galaxy Boadilla | locales-actividades | 2 €/niño en grupos (lun-jue) | hop-galaxy-boadilla.html |
+| Hito Psicología | salud | 5% en determinados servicios | hito-psicologia.html |
 | Indoorwall Getafe | locales-actividades | Matrícula escuela gratis + Actividades 8,5 € niños | indoorwall-getafe.html |
 | JumpYard Getafe | locales-actividades | Cumpleañero gratis (cumpleaños) | jumpyard-getafe.html |
+| La Gata Flora | compras | 10% de descuento + Taller infantil 16 €/niño | la-gata-flora.html |
 | Legapark | locales-actividades | 10% en determinados servicios | legapark.html |
 | Mundifantasía | locales-actividades | 10% en determinados servicios | mundifantasia.html |
 | Ohana Acai Getafe | cultura | 10% de descuento | ohana-acai-getafe.html |
@@ -160,4 +162,4 @@ Si hay porcentaje **y** ventajas no porcentuales (revisiones gratis, TAC gratis,
 
 ---
 
-*Última actualización: 24 de septiembre de 2026*
+*Última actualización: 28 de septiembre de 2026*
