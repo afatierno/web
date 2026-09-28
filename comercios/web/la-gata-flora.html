@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#ffffff">
-  <title>Rey de Pikas</title>
+  <title>La Gata Flora</title>
   <link rel="stylesheet" href="css/dossier.css">
   <style>
     .ficha-hero {
@@ -54,6 +54,22 @@
       line-height: 1.55;
     }
 
+    .ficha-section ul {
+      margin: 10px 0 0;
+      padding-left: 1.2rem;
+      color: var(--text);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .ficha-section li + li {
+      margin-top: 4px;
+    }
+
+    .ficha-section p + p {
+      margin-top: 10px;
+    }
+
     .ficha-contact {
       margin-top: 20px;
       padding: 18px;
@@ -88,32 +104,47 @@
   <main class="page">
     <header class="page-header">
       <p class="page-eyebrow">AFA CEIP Enrique Tierno Galván de Getafe</p>
-      <h1>Rey de Pikas</h1>
-      <p class="page-subtitle"><span class="type-badge">Teatro</span></p>
+      <h1>La Gata Flora</h1>
+      <p class="page-subtitle"><span class="type-badge">Chocolatería artesanal</span></p>
     </header>
 
     <section class="ficha-hero" aria-label="Presentación">
-      <img src="assets/images/teatro_rey_de_pikas_2.png" alt="Teatro Rey de Pikas">
-      <p>Teatro en Leganés: magia, teatro infantil, monólogos, conciertos, cumpleaños y campaña escolar.</p>
+      <img src="assets/images/lagataflora.jpg" alt="La Gata Flora">
+      <p>
+        Tienda de chocolates y bombones artesanales en Getafe: productos del cacao elaborados en obradores de todo el país
+        y un espacio para talleres que acercan el mundo del chocolate al municipio.
+      </p>
     </section>
 
     <section class="ficha-section" aria-labelledby="afa-title">
-      <h2 id="afa-title">🎭 Ventaja para socios del AFA</h2>
-      <p>Los socios del AFA CEIP Enrique Tierno Galván de Getafe tienen <strong>1 consumición gratis por entrada</strong>.</p>
+      <h2 id="afa-title">🍫 Ventajas para socios del AFA</h2>
+      <p>Los socios del AFA CEIP Enrique Tierno Galván de Getafe disfrutan de:</p>
+      <ul>
+        <li><strong>10% de descuento</strong> en todos los productos de la tienda, presentando la acreditación de socio</li>
+        <li><strong>Taller infantil estándar a 16 €/niño</strong> (precio habitual 18 €). No aplica a talleres especiales (Halloween, Navidad, etc.)</li>
+      </ul>
+    </section>
+
+    <section class="ficha-section" aria-labelledby="talleres-title">
+      <h2 id="talleres-title">👩‍🍳 Talleres de chocolate</h2>
+      <p>Actividades de unos 90–105 minutos para descubrir y crear con chocolate:</p>
+      <ul>
+        <li>Tableta + degustación (adultos, 30 €/persona)</li>
+        <li>Creaciones de chocolate (adultos, 30 €/persona)</li>
+        <li>El laboratorio de chocolate (infantil, 18 €/persona; socios del AFA: 16 € en el taller estándar)</li>
+      </ul>
+      <p>Los talleres para adultos pueden adaptarse al grupo. Para cumpleaños, eventos cerrados o actividades en el colegio, contacta con la tienda.</p>
     </section>
 
     <section class="ficha-contact" aria-labelledby="contacto-title">
-      <h2 id="contacto-title">📍 Teatro Rey de Pikas</h2>
+      <h2 id="contacto-title">📍 La Gata Flora</h2>
       <p>
-        <a class="address-link" href="https://www.google.com/maps/search/?api=1&amp;query=Teatro+Rey+de+Pikas,+C.+de+Tirso+de+Molina+4,+28912+Legan%C3%A9s,+Madrid,+Espa%C3%B1a" target="_blank" rel="noopener noreferrer">
-          C. de Tirso de Molina, 4 · 28912 Leganés, Madrid
+        <a class="address-link" href="https://www.google.com/maps/search/?api=1&amp;query=Calle+de+la+Cruz+8,+28901+Getafe,+Madrid,+Espa%C3%B1a" target="_blank" rel="noopener noreferrer">
+          C. de la Cruz, 8 · Getafe (junto a la Plaza General Palacio)
         </a>
       </p>
       <p>
-        <a class="text-link" href="tel:+34656447398">656 447 398</a>
-      </p>
-      <p>
-        <a class="text-link" href="https://teatroreydepikas.com/" target="_blank" rel="noopener noreferrer">teatroreydepikas.com</a>
+        <a class="text-link" href="tel:+34622108813">622 108 813</a>
       </p>
     </section>
 

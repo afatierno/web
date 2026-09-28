@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#ffffff">
-  <title>Rey de Pikas</title>
+  <title>Hito Psicología</title>
   <link rel="stylesheet" href="css/dossier.css">
   <style>
     .ficha-hero {
@@ -16,12 +16,20 @@
       text-align: center;
     }
 
-    .ficha-hero img {
-      display: block;
-      max-width: 280px;
+    .ficha-hero-media {
       width: 100%;
-      height: auto;
-      margin: 0 auto 16px;
+      aspect-ratio: 16 / 9;
+      margin: 0 0 16px;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .ficha-hero-media img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
     }
 
     .ficha-hero p {
@@ -52,6 +60,18 @@
       color: var(--text);
       font-size: 0.92rem;
       line-height: 1.55;
+    }
+
+    .ficha-section ul {
+      margin: 10px 0 0;
+      padding-left: 1.2rem;
+      color: var(--text);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .ficha-section li + li {
+      margin-top: 4px;
     }
 
     .ficha-contact {
@@ -88,32 +108,39 @@
   <main class="page">
     <header class="page-header">
       <p class="page-eyebrow">AFA CEIP Enrique Tierno Galván de Getafe</p>
-      <h1>Rey de Pikas</h1>
-      <p class="page-subtitle"><span class="type-badge">Teatro</span></p>
+      <h1>Hito Psicología</h1>
+      <p class="page-subtitle"><span class="type-badge">Psicología</span></p>
     </header>
 
     <section class="ficha-hero" aria-label="Presentación">
-      <img src="assets/images/teatro_rey_de_pikas_2.png" alt="Teatro Rey de Pikas">
-      <p>Teatro en Leganés: magia, teatro infantil, monólogos, conciertos, cumpleaños y campaña escolar.</p>
+      <div class="ficha-hero-media">
+        <img src="assets/images/natalia_psicologia.jpg" alt="Hito Psicología">
+      </div>
+      <p>Atención psicológica en Fuenlabrada con enfoque en ansiedad, depresión y bienestar emocional de adolescentes, adultos y parejas.</p>
     </section>
 
     <section class="ficha-section" aria-labelledby="afa-title">
-      <h2 id="afa-title">🎭 Ventaja para socios del AFA</h2>
-      <p>Los socios del AFA CEIP Enrique Tierno Galván de Getafe tienen <strong>1 consumición gratis por entrada</strong>.</p>
+      <h2 id="afa-title">🧠 Ventajas para socios del AFA</h2>
+      <p>Los socios del AFA CEIP Enrique Tierno Galván de Getafe disfrutan de un <strong>5% de descuento</strong> en determinados servicios.</p>
+    </section>
+
+    <section class="ficha-section" aria-labelledby="servicios-title">
+      <h2 id="servicios-title">💬 Servicios</h2>
+      <p>Adolescentes (desde los 11 años), adultos y terapia de pareja. Especialista en trastornos de ansiedad y depresión.</p>
     </section>
 
     <section class="ficha-contact" aria-labelledby="contacto-title">
-      <h2 id="contacto-title">📍 Teatro Rey de Pikas</h2>
+      <h2 id="contacto-title">📍 Hito Psicología</h2>
       <p>
-        <a class="address-link" href="https://www.google.com/maps/search/?api=1&amp;query=Teatro+Rey+de+Pikas,+C.+de+Tirso+de+Molina+4,+28912+Legan%C3%A9s,+Madrid,+Espa%C3%B1a" target="_blank" rel="noopener noreferrer">
-          C. de Tirso de Molina, 4 · 28912 Leganés, Madrid
+        <a class="address-link" href="https://www.google.com/maps/search/?api=1&amp;query=Calle+Cuba+1,+Fuenlabrada,+Madrid,+Espa%C3%B1a" target="_blank" rel="noopener noreferrer">
+          Calle Cuba, 1 · Fuenlabrada, Madrid
         </a>
       </p>
       <p>
-        <a class="text-link" href="tel:+34656447398">656 447 398</a>
+        <a class="text-link" href="tel:+34641257220">641 257 220</a>
       </p>
       <p>
-        <a class="text-link" href="https://teatroreydepikas.com/" target="_blank" rel="noopener noreferrer">teatroreydepikas.com</a>
+        <a class="text-link" href="mailto:nataliapoyatopsicologa@gmail.com">nataliapoyatopsicologa@gmail.com</a>
       </p>
     </section>
 
