@@ -71,8 +71,8 @@ SCHEDULE = [
     ]),
     ("Aulas Primaria", [
         ["Inglés · P", "Teatro · I+P"],
-        ["Inglés · P", "Ajedrez M/J · P", "Homework · P", "Pintura · P"],
-        ["Inglés · P", "Oratoria · P", "Teatro · I+P"],
+        ["Inglés · P", "Ajedrez M/J · P", "Club de Lectura · 3A-8A", "Homework · P", "Pintura · P"],
+        ["Inglés · P", "Teatro · I+P"],
         ["Inglés · P", "Ajedrez M/J · P", "Homework · P", "Pintura · P"],
         ["Ajedrez V · P", "Informática/videojuegos · P"],
     ]),
