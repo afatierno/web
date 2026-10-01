@@ -324,7 +324,7 @@ async function validateRawInput(rawInput) {
   await stopScanner();
 
   try {
-    const data = await fetchCarnetDetail(parsed.config, activeController.signal);
+    const data = await fetchCarnetDetail(parsed.config, CONFIG, activeController.signal);
     showFamilyDetails(data.headers, data.values);
     showScanResultActions();
   } catch (error) {
