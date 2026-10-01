@@ -1,6 +1,6 @@
-import { CONFIG, CONFIG_ERROR, CONFIG_PENDING_REDIRECT } from "./config.js?v=0011";
-import { fetchSearch } from "./api.js?v=0011";
-import { clearResultsTable, renderResultsTable } from "./render.js?v=0011";
+import { CONFIG, CONFIG_ERROR, CONFIG_PENDING_REDIRECT } from "./config.js?v=0012";
+import { fetchSearch } from "./api.js?v=0012";
+import { clearResultsTable, renderResultsTable } from "./render.js?v=0012";
 
 const queryInput = document.getElementById("query");
 const statusEl = document.getElementById("status");
@@ -129,7 +129,7 @@ async function handleSearch(query) {
   clearRequestTiming();
 
   try {
-    const data = await fetchSearch(query, abortController.signal, true);
+    const data = await fetchSearch(query, abortController.signal);
 
     if (generation !== searchGeneration) {
       return;
