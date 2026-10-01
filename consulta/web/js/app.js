@@ -1,21 +1,21 @@
-import { CONFIG, CONFIG_ERROR, CONFIG_PENDING_REDIRECT } from "./config.js?v=0003";
-import { fetchSearch } from "./api.js";
-import { createResultsRenderer } from "./render.js?v=0003";
+import { CONFIG, CONFIG_ERROR, CONFIG_PENDING_REDIRECT } from "./config.js?v=0011";
+import { fetchSearch } from "./api.js?v=0011";
+import { clearResultsTable, renderResultsTable } from "./render.js?v=0011";
 
 const queryInput = document.getElementById("query");
 const statusEl = document.getElementById("status");
+const requestTimingEl = document.getElementById("request-timing");
 const searchForm = document.getElementById("search-form");
 const clearButton = document.getElementById("btn-clear");
+const resultsWrap = document.getElementById("results-wrap");
 const tableHead = document.getElementById("table-head");
 const tableBody = document.getElementById("table-body");
-const resultsWrap = document.getElementById("results-wrap");
 
-const { clearResults, renderResults } = createResultsRenderer({
+const resultsElements = {
   resultsWrap,
   tableHead,
   tableBody,
-  statusEl,
-});
+};
 
 let debounceTimer = null;
 let debounceToken = 0;
@@ -50,42 +50,102 @@ function cancelActiveSearch() {
   searchGeneration += 1;
 }
 
+function clearRequestTiming() {
+  if (!requestTimingEl) {
+    return;
+  }
+
+  requestTimingEl.hidden = true;
+  requestTimingEl.textContent = "";
+}
+
+function clearResults() {
+  clearResultsTable(resultsElements);
+  clearRequestTiming();
+
+  if (resultsWrap) {
+    resultsWrap.classList.add("hidden");
+  }
+}
+
 function resetStatus() {
   statusEl.classList.remove("error");
   statusEl.textContent = "Escribe al menos 4 caracteres para buscar";
+  clearResults();
 }
 
-function handleClear() {
-  cancelActiveSearch();
-  clearDebounce();
-  lastManualSearch = null;
-  queryInput.value = "";
-  clearResults();
-  resetStatus();
-  queryInput.focus();
+function formatMs(ms) {
+  const elapsed = Math.max(0, ms);
+
+  if (elapsed < 1000) {
+    return `${Math.round(elapsed)} ms`;
+  }
+
+  return `${(elapsed / 1000).toFixed(2)} s`;
+}
+
+function formatTimingText(clientMs, data) {
+  const count = Array.isArray(data?.results) ? data.results.length : 0;
+  const timing = data?.timing;
+  let serverPart = "";
+
+  if (timing && typeof timing === "object") {
+    serverPart =
+      ` · servidor: carga ${formatMs(timing.loadMs)}, búsqueda ${formatMs(timing.searchMs)}` +
+      (timing.authMs != null ? `, token ${formatMs(timing.authMs)}` : "") +
+      (timing.rowCount != null ? `, ${timing.rowCount} filas en memoria` : "");
+  }
+
+  const sources = [];
+  if (data?.searchSource) {
+    sources.push(`datos: ${data.searchSource}`);
+  }
+  if (data?.tokenSource) {
+    sources.push(`token: ${data.tokenSource}`);
+  }
+
+  const sourcePart = sources.length > 0 ? ` · ${sources.join(", ")}` : "";
+
+  return `${formatMs(clientMs)} (cliente)${serverPart}${sourcePart} · ${count} resultados`;
+}
+
+function showRequestTiming(clientMs, data) {
+  if (!requestTimingEl) {
+    return;
+  }
+
+  requestTimingEl.hidden = false;
+  requestTimingEl.textContent = formatTimingText(clientMs, data);
 }
 
 async function handleSearch(query) {
   const generation = ++searchGeneration;
   const abortController = new AbortController();
   activeAbortController = abortController;
+  const startedAt = performance.now();
 
   statusEl.textContent = "Cargando…";
   statusEl.classList.remove("error");
+  clearRequestTiming();
 
   try {
-    const data = await fetchSearch(query, abortController.signal);
+    const data = await fetchSearch(query, abortController.signal, true);
 
     if (generation !== searchGeneration) {
       return;
     }
 
-    renderResults(data);
+    renderResultsTable(data, {
+      ...resultsElements,
+      metaEl: statusEl,
+    });
+    showRequestTiming(performance.now() - startedAt, data);
   } catch (err) {
     if (err.name === "AbortError" || generation !== searchGeneration) {
       return;
     }
 
+    clearResults();
     statusEl.textContent = err.message;
     statusEl.classList.add("error");
   } finally {
@@ -93,6 +153,15 @@ async function handleSearch(query) {
       activeAbortController = null;
     }
   }
+}
+
+function handleClear() {
+  cancelActiveSearch();
+  clearDebounce();
+  lastManualSearch = null;
+  queryInput.value = "";
+  resetStatus();
+  queryInput.focus();
 }
 
 function handleManualSearch(event) {
@@ -171,6 +240,7 @@ function onQueryInput() {
   }
 
   statusEl.textContent = "Escribiendo…";
+  clearRequestTiming();
   scheduleSearch();
 }
 

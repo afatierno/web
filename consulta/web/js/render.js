@@ -52,63 +52,92 @@ function getVisibleColumnIndexes(headers, rows) {
   return visibleColumnIndexes;
 }
 
-export function createResultsRenderer(elements) {
-  const { resultsWrap, tableHead, tableBody, statusEl } = elements;
+export function clearResultsTable(elements) {
+  const { resultsWrap, tableHead, tableBody, metaEl } = elements;
 
-  function clearResults() {
+  if (resultsWrap) {
     resultsWrap.classList.add("hidden");
+  }
+
+  if (tableHead) {
     tableHead.replaceChildren();
+  }
+
+  if (tableBody) {
     tableBody.replaceChildren();
   }
 
-  function renderResults(data) {
-    resultsWrap.classList.remove("hidden");
-    tableHead.replaceChildren();
-    tableBody.replaceChildren();
+  if (metaEl) {
+    metaEl.textContent = "";
+    metaEl.classList.remove("error");
+  }
+}
 
-    if (!data || !Array.isArray(data.results) || data.results.length === 0) {
-      statusEl.textContent = "No se encontraron resultados.";
-      return;
+export function renderResultsTable(data, elements) {
+  const { resultsWrap, tableHead, tableBody, metaEl } = elements;
+
+  if (!tableHead || !tableBody) {
+    return;
+  }
+
+  tableHead.replaceChildren();
+  tableBody.replaceChildren();
+
+  if (!data || !Array.isArray(data.results) || data.results.length === 0) {
+    if (resultsWrap) {
+      resultsWrap.classList.add("hidden");
     }
 
-    const headers =
-      Array.isArray(data.headers) && data.headers.length > 0
-        ? data.headers
-        : (data.results[0].data || []).map((_, index) => `Columna ${index + 1}`);
+    if (metaEl) {
+      metaEl.textContent = "No se encontraron resultados.";
+      metaEl.classList.remove("error");
+    }
 
-    const rows = data.results.map((item) => (Array.isArray(item.data) ? item.data : []));
-    const pagadoColumnIndex = findPagadoColumnIndex(headers);
-    const visibleColumnIndexes = getVisibleColumnIndexes(headers, rows);
-
-    visibleColumnIndexes.forEach((index) => {
-      const th = document.createElement("th");
-      const fullHeaderText = headers[index] || `Columna ${index + 1}`;
-      th.textContent = truncateHeader(fullHeaderText, 30);
-      th.title = String(fullHeaderText).replace(/\s+/g, " ").trim();
-      tableHead.appendChild(th);
-    });
-
-    rows.forEach((values) => {
-      const tr = document.createElement("tr");
-
-      if (pagadoColumnIndex >= 0) {
-        const pagadoClass = rowClassForPagadoValue(values[pagadoColumnIndex]);
-        if (pagadoClass) {
-          tr.classList.add(pagadoClass);
-        }
-      }
-
-      visibleColumnIndexes.forEach((index) => {
-        const td = document.createElement("td");
-        td.textContent = values[index] ?? "";
-        tr.appendChild(td);
-      });
-
-      tableBody.appendChild(tr);
-    });
-
-    statusEl.textContent = `Se encontraron ${data.results.length} resultados.`;
+    return;
   }
 
-  return { clearResults, renderResults };
+  if (resultsWrap) {
+    resultsWrap.classList.remove("hidden");
+  }
+
+  const headers =
+    Array.isArray(data.headers) && data.headers.length > 0
+      ? data.headers
+      : (data.results[0].data || []).map((_, index) => `Columna ${index + 1}`);
+
+  const rows = data.results.map((item) => (Array.isArray(item.data) ? item.data : []));
+  const pagadoColumnIndex = findPagadoColumnIndex(headers);
+  const visibleColumnIndexes = getVisibleColumnIndexes(headers, rows);
+
+  visibleColumnIndexes.forEach((index) => {
+    const th = document.createElement("th");
+    const fullHeaderText = headers[index] || `Columna ${index + 1}`;
+    th.textContent = truncateHeader(fullHeaderText, 30);
+    th.title = String(fullHeaderText).replace(/\s+/g, " ").trim();
+    tableHead.appendChild(th);
+  });
+
+  rows.forEach((values) => {
+    const tr = document.createElement("tr");
+
+    if (pagadoColumnIndex >= 0) {
+      const pagadoClass = rowClassForPagadoValue(values[pagadoColumnIndex]);
+      if (pagadoClass) {
+        tr.classList.add(pagadoClass);
+      }
+    }
+
+    visibleColumnIndexes.forEach((index) => {
+      const td = document.createElement("td");
+      td.textContent = values[index] ?? "";
+      tr.appendChild(td);
+    });
+
+    tableBody.appendChild(tr);
+  });
+
+  if (metaEl) {
+    metaEl.textContent = `Se encontraron ${data.results.length} resultados.`;
+    metaEl.classList.remove("error");
+  }
 }
