@@ -7,6 +7,33 @@ function truncateHeader(text, maxLen) {
   return `${clean.slice(0, maxLen - 1).trim()}…`;
 }
 
+function normalizePagadoText(text) {
+  return String(text ?? "")
+    .replace(/\{\{|\}\}/g, "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "");
+}
+
+function findPagadoColumnIndex(headers) {
+  return headers.findIndex((header) => normalizePagadoText(header) === "pagado");
+}
+
+function rowClassForPagadoValue(value) {
+  const normalized = normalizePagadoText(value);
+  if (normalized === "") {
+    return "row-pagado-empty";
+  }
+  if (normalized === "si") {
+    return "row-pagado-si";
+  }
+  if (normalized === "no") {
+    return "row-pagado-no";
+  }
+  return "";
+}
+
 function getVisibleColumnIndexes(headers, rows) {
   const columnCount = Math.max(headers.length, ...rows.map((row) => row.length));
   const visibleColumnIndexes = [];
@@ -50,6 +77,7 @@ export function createResultsRenderer(elements) {
         : (data.results[0].data || []).map((_, index) => `Columna ${index + 1}`);
 
     const rows = data.results.map((item) => (Array.isArray(item.data) ? item.data : []));
+    const pagadoColumnIndex = findPagadoColumnIndex(headers);
     const visibleColumnIndexes = getVisibleColumnIndexes(headers, rows);
 
     visibleColumnIndexes.forEach((index) => {
@@ -62,6 +90,13 @@ export function createResultsRenderer(elements) {
 
     rows.forEach((values) => {
       const tr = document.createElement("tr");
+
+      if (pagadoColumnIndex >= 0) {
+        const pagadoClass = rowClassForPagadoValue(values[pagadoColumnIndex]);
+        if (pagadoClass) {
+          tr.classList.add(pagadoClass);
+        }
+      }
 
       visibleColumnIndexes.forEach((index) => {
         const td = document.createElement("td");

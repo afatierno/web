@@ -49,9 +49,9 @@ SCHEDULE = [
         [],
     ]),
     ("Pista Pequeña", [
-        ["Atletismo · 2P-6P"],
+        [],
         ["Fútbol sala · P"],
-        ["Atletismo · 2P-6P"],
+        [],
         ["Fútbol sala · P"],
         [],
     ]),
@@ -67,14 +67,14 @@ SCHEDULE = [
         ["Inglés · I", "Culturekids · I"],
         ["Inglés · I", "Científ. chiflados · I", "Sportkids · I"],
         ["Inglés · I", "Culturekids · I"],
-        ["Dancekids · I"],
+        [],
     ]),
     ("Aulas Primaria", [
         ["Inglés · P", "Teatro · I+P"],
         ["Inglés · P", "Ajedrez M/J · P", "Club de Lectura · 3A-8A", "Homework · P", "Pintura · P"],
         ["Inglés · P", "Teatro · I+P"],
         ["Inglés · P", "Ajedrez M/J · P", "Homework · P", "Pintura · P"],
-        ["Ajedrez V · P", "Informática/videojuegos · P"],
+        ["Ajedrez V · P"],
     ]),
 ]
 

@@ -140,6 +140,18 @@ th {
   background: #f4f4f4;
 }
 
+tbody tr.row-pagado-si {
+  background: #dcfce7;
+}
+
+tbody tr.row-pagado-no {
+  background: #fee2e2;
+}
+
+tbody tr.row-pagado-empty {
+  background: #fef9c3;
+}
+
 .error {
   color: #c00;
   font-weight: bold;
