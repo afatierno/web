@@ -1,6 +1,6 @@
-import { CONFIG, CONFIG_ERROR, CONFIG_PENDING_REDIRECT } from "./config.js?v=0002";
+import { CONFIG, CONFIG_ERROR, CONFIG_PENDING_REDIRECT } from "./config.js?v=0003";
 import { fetchSearch } from "./api.js";
-import { createResultsRenderer } from "./render.js";
+import { createResultsRenderer } from "./render.js?v=0003";
 
 const queryInput = document.getElementById("query");
 const statusEl = document.getElementById("status");
