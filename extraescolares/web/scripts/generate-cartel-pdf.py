@@ -67,7 +67,7 @@ SCHEDULE = [
         ["Inglés · I", "Culturekids · I"],
         ["Inglés · I", "Científ. chiflados · I", "Sportkids · I"],
         ["Inglés · I", "Culturekids · I"],
-        [],
+        ["Teatro · I"],
     ]),
     ("Aulas Primaria", [
         ["Inglés · P", "Teatro · I+P"],
