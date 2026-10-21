@@ -35,17 +35,17 @@ DASH = "—"
 
 SCHEDULE = [
     ("Gimnasio", [
-        ["Gimn. acrobática · 5A+P", "Baile moderno · 5A+P"],
+        ["Gimn. acrobática · 5A+P", "Baile moderno · I+P"],
         ["Kaisaido · 5A+P", "Bujinkan · 5A+P"],
-        ["Gimn. acrobática · 5A+P", "Baile moderno · 5A+P"],
+        ["Gimn. acrobática · 5A+P", "Baile moderno · I+P"],
         ["Kaisaido · 5A+P", "Bujinkan · 5A+P"],
         ["Gimn. rítmica · I+P"],
     ]),
     ("Pista Grande", [
         ["Baloncesto · P"],
-        ["Patines I/II · 5A+P"],
+        ["Patines I/II · I+P"],
         ["Baloncesto · P"],
-        ["Patines I/II · 5A+P"],
+        ["Patines I/II · I+P"],
         [],
     ]),
     ("Pista Pequeña", [
