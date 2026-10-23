@@ -7,14 +7,13 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Búsqueda</title>
-  <link rel="stylesheet" href="css/styles.css?v=0012">
+  <link rel="stylesheet" href="css/styles.css?v=0017">
 </head>
 <body>
-  <h1>Búsqueda <span class="page-version">v0012</span></h1>
-  <p class="access-notice">Enlace personal e intransferible. Es responsabilidad del titular no compartirlo.</p>
+  <h1>Búsqueda <span class="page-version">v0017</span></h1>
 
-  <div class="panel">
-    <label for="query">Término de búsqueda</label>
+  <details class="panel search-panel" open>
+    <summary class="search-panel-toggle">Término de búsqueda</summary>
     <form id="search-form" class="search-row">
       <input
         id="query"
@@ -25,7 +24,26 @@
       >
       <button id="btn-clear" type="button" class="btn-secondary">Limpiar</button>
     </form>
-  </div>
+  </details>
+
+  <details class="panel search-panel">
+    <summary class="search-panel-toggle">Número de socio</summary>
+    <form id="socio-search-form" class="search-row">
+      <div class="socio-number-field">
+        <span class="socio-number-prefix" aria-hidden="true">202627</span>
+        <input
+          id="socio-number"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          placeholder="000"
+          autocomplete="off"
+          enterkeyhint="search"
+        >
+      </div>
+      <button id="btn-clear-socio" type="button" class="btn-secondary">Limpiar</button>
+    </form>
+  </details>
 
   <p id="status">Escribe al menos 4 caracteres para buscar</p>
 
@@ -38,9 +56,10 @@
         <tbody id="table-body"></tbody>
       </table>
     </div>
+    <p id="results-count" class="results-count" hidden></p>
     <p id="request-timing" class="request-timing" hidden></p>
   </div>
 
-  <script src="js/app.js?v=0012" type="module"></script>
+  <script src="js/app.js?v=0017" type="module"></script>
 </body>
 </html>

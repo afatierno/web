@@ -52,8 +52,17 @@ function getVisibleColumnIndexes(headers, rows) {
   return visibleColumnIndexes;
 }
 
+function clearResultsCount(countEl) {
+  if (!countEl) {
+    return;
+  }
+
+  countEl.hidden = true;
+  countEl.textContent = "";
+}
+
 export function clearResultsTable(elements) {
-  const { resultsWrap, tableHead, tableBody, metaEl } = elements;
+  const { resultsWrap, tableHead, tableBody, metaEl, countEl } = elements;
 
   if (resultsWrap) {
     resultsWrap.classList.add("hidden");
@@ -67,6 +76,8 @@ export function clearResultsTable(elements) {
     tableBody.replaceChildren();
   }
 
+  clearResultsCount(countEl);
+
   if (metaEl) {
     metaEl.textContent = "";
     metaEl.classList.remove("error");
@@ -74,7 +85,7 @@ export function clearResultsTable(elements) {
 }
 
 export function renderResultsTable(data, elements) {
-  const { resultsWrap, tableHead, tableBody, metaEl } = elements;
+  const { resultsWrap, tableHead, tableBody, metaEl, countEl } = elements;
 
   if (!tableHead || !tableBody) {
     return;
@@ -82,6 +93,7 @@ export function renderResultsTable(data, elements) {
 
   tableHead.replaceChildren();
   tableBody.replaceChildren();
+  clearResultsCount(countEl);
 
   if (!data || !Array.isArray(data.results) || data.results.length === 0) {
     if (resultsWrap) {
@@ -137,7 +149,12 @@ export function renderResultsTable(data, elements) {
   });
 
   if (metaEl) {
-    metaEl.textContent = `Se encontraron ${data.results.length} resultados.`;
+    metaEl.textContent = "";
     metaEl.classList.remove("error");
+  }
+
+  if (countEl) {
+    countEl.hidden = false;
+    countEl.textContent = `Se encontraron ${data.results.length} resultados.`;
   }
 }

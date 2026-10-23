@@ -1,12 +1,16 @@
-import { CONFIG, CONFIG_ERROR, CONFIG_PENDING_REDIRECT } from "./config.js?v=0012";
-import { fetchSearch } from "./api.js?v=0012";
-import { clearResultsTable, renderResultsTable } from "./render.js?v=0012";
+import { CONFIG, CONFIG_ERROR, CONFIG_PENDING_REDIRECT } from "./config.js?v=0017";
+import { fetchSearch } from "./api.js?v=0017";
+import { clearResultsTable, renderResultsTable } from "./render.js?v=0017";
 
 const queryInput = document.getElementById("query");
+const socioNumberInput = document.getElementById("socio-number");
 const statusEl = document.getElementById("status");
+const resultsCountEl = document.getElementById("results-count");
 const requestTimingEl = document.getElementById("request-timing");
 const searchForm = document.getElementById("search-form");
+const socioSearchForm = document.getElementById("socio-search-form");
 const clearButton = document.getElementById("btn-clear");
+const clearSocioButton = document.getElementById("btn-clear-socio");
 const resultsWrap = document.getElementById("results-wrap");
 const tableHead = document.getElementById("table-head");
 const tableBody = document.getElementById("table-body");
@@ -15,6 +19,7 @@ const resultsElements = {
   resultsWrap,
   tableHead,
   tableBody,
+  countEl: resultsCountEl,
 };
 
 let debounceTimer = null;
@@ -22,6 +27,18 @@ let debounceToken = 0;
 let activeAbortController = null;
 let searchGeneration = 0;
 let lastManualSearch = null;
+
+function socioPrefix() {
+  return CONFIG?.SOCIO_NUMBER_PREFIX || "202627";
+}
+
+function buildSocioQuery(digits) {
+  return socioPrefix() + String(digits || "").replace(/\D/g, "");
+}
+
+function digitsOnly(value) {
+  return String(value || "").replace(/\D/g, "");
+}
 
 function clearDebounce() {
   debounceToken += 1;
@@ -155,6 +172,16 @@ async function handleSearch(query) {
   }
 }
 
+function clearOtherInput(active) {
+  if (active === "query" && socioNumberInput) {
+    socioNumberInput.value = "";
+  }
+
+  if (active === "socio" && queryInput) {
+    queryInput.value = "";
+  }
+}
+
 function handleClear() {
   cancelActiveSearch();
   clearDebounce();
@@ -164,10 +191,20 @@ function handleClear() {
   queryInput.focus();
 }
 
+function handleClearSocio() {
+  cancelActiveSearch();
+  clearDebounce();
+  lastManualSearch = null;
+  socioNumberInput.value = "";
+  resetStatus();
+  socioNumberInput.focus();
+}
+
 function handleManualSearch(event) {
   event.preventDefault();
   cancelActiveSearch();
   clearDebounce();
+  clearOtherInput("query");
 
   const query = queryInput.value.trim();
   clearResults();
@@ -189,8 +226,37 @@ function handleManualSearch(event) {
   statusEl.textContent = "Escribe al menos 3 caracteres para buscar con Enter";
 }
 
-function scheduleSearch() {
-  const query = queryInput.value.trim();
+function handleManualSocioSearch(event) {
+  event.preventDefault();
+  cancelActiveSearch();
+  clearDebounce();
+  clearOtherInput("socio");
+
+  const digits = digitsOnly(socioNumberInput.value);
+  socioNumberInput.value = digits;
+  const query = buildSocioQuery(digits);
+  clearResults();
+
+  if (digits.length === 0) {
+    lastManualSearch = null;
+    resetStatus();
+    return;
+  }
+
+  if (digits.length >= CONFIG.SOCIO_NUMBER_MIN_DIGITS) {
+    lastManualSearch = { query, at: Date.now() };
+    handleSearch(query);
+    return;
+  }
+
+  lastManualSearch = null;
+  statusEl.classList.remove("error");
+  statusEl.textContent =
+    "Escribe al menos " + CONFIG.SOCIO_NUMBER_MIN_DIGITS + " dígitos del número de socio";
+}
+
+function scheduleSearch(getQuery) {
+  const query = getQuery();
 
   if (wasRecentlyManualSearch(query)) {
     return;
@@ -204,7 +270,7 @@ function scheduleSearch() {
       return;
     }
 
-    const currentQuery = queryInput.value.trim();
+    const currentQuery = getQuery();
 
     if (wasRecentlyManualSearch(currentQuery)) {
       return;
@@ -221,9 +287,48 @@ function scheduleSearch() {
   }, CONFIG.DEBOUNCE_MS);
 }
 
+function scheduleSocioSearch() {
+  const digits = digitsOnly(socioNumberInput.value);
+  const query = buildSocioQuery(digits);
+
+  if (wasRecentlyManualSearch(query)) {
+    return;
+  }
+
+  clearDebounce();
+  const token = debounceToken;
+
+  debounceTimer = setTimeout(() => {
+    if (token !== debounceToken) {
+      return;
+    }
+
+    const currentDigits = digitsOnly(socioNumberInput.value);
+    const currentQuery = buildSocioQuery(currentDigits);
+
+    if (wasRecentlyManualSearch(currentQuery)) {
+      return;
+    }
+
+    clearResults();
+
+    if (currentDigits.length >= CONFIG.SOCIO_NUMBER_MIN_DIGITS) {
+      lastManualSearch = null;
+      handleSearch(currentQuery);
+    } else if (currentDigits.length === 0) {
+      resetStatus();
+    } else {
+      statusEl.classList.remove("error");
+      statusEl.textContent =
+        "Escribe al menos " + CONFIG.SOCIO_NUMBER_MIN_DIGITS + " dígitos del número de socio";
+    }
+  }, CONFIG.DEBOUNCE_MS);
+}
+
 function onQueryInput() {
   cancelActiveSearch();
   statusEl.classList.remove("error");
+  clearOtherInput("query");
 
   const query = queryInput.value.trim();
 
@@ -241,7 +346,47 @@ function onQueryInput() {
 
   statusEl.textContent = "Escribiendo…";
   clearRequestTiming();
-  scheduleSearch();
+  scheduleSearch(() => queryInput.value.trim());
+}
+
+function onSocioNumberInput() {
+  cancelActiveSearch();
+  statusEl.classList.remove("error");
+  clearOtherInput("socio");
+
+  const digits = digitsOnly(socioNumberInput.value);
+  if (socioNumberInput.value !== digits) {
+    socioNumberInput.value = digits;
+  }
+
+  if (digits.length === 0) {
+    clearDebounce();
+    lastManualSearch = null;
+    clearResults();
+    resetStatus();
+    return;
+  }
+
+  const query = buildSocioQuery(digits);
+
+  if (lastManualSearch && lastManualSearch.query !== query) {
+    lastManualSearch = null;
+  }
+
+  if (digits.length < CONFIG.SOCIO_NUMBER_MIN_DIGITS) {
+    clearDebounce();
+    lastManualSearch = null;
+    clearResults();
+    statusEl.classList.remove("error");
+    statusEl.textContent =
+      "Escribe al menos " + CONFIG.SOCIO_NUMBER_MIN_DIGITS + " dígitos del número de socio";
+    clearRequestTiming();
+    return;
+  }
+
+  statusEl.textContent = "Escribiendo…";
+  clearRequestTiming();
+  scheduleSocioSearch();
 }
 
 function showConfigError(message) {
@@ -250,6 +395,16 @@ function showConfigError(message) {
   queryInput.disabled = true;
   clearButton.disabled = true;
   searchForm.addEventListener("submit", (event) => event.preventDefault());
+
+  if (socioNumberInput) {
+    socioNumberInput.disabled = true;
+  }
+  if (clearSocioButton) {
+    clearSocioButton.disabled = true;
+  }
+  if (socioSearchForm) {
+    socioSearchForm.addEventListener("submit", (event) => event.preventDefault());
+  }
 }
 
 function init() {
@@ -262,9 +417,33 @@ function init() {
     return;
   }
 
+  const prefixEl = document.querySelector(".socio-number-prefix");
+  if (prefixEl) {
+    prefixEl.textContent = socioPrefix();
+  }
+
+  const searchPanels = Array.from(document.querySelectorAll("details.search-panel"));
+  searchPanels.forEach((panel) => {
+    panel.addEventListener("toggle", () => {
+      if (!panel.open) {
+        return;
+      }
+
+      searchPanels.forEach((other) => {
+        if (other !== panel) {
+          other.open = false;
+        }
+      });
+    });
+  });
+
   queryInput.addEventListener("input", onQueryInput);
   searchForm.addEventListener("submit", handleManualSearch);
   clearButton.addEventListener("click", handleClear);
+
+  socioNumberInput.addEventListener("input", onSocioNumberInput);
+  socioSearchForm.addEventListener("submit", handleManualSocioSearch);
+  clearSocioButton.addEventListener("click", handleClearSocio);
 }
 
 init();

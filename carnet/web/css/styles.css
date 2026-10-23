@@ -411,7 +411,7 @@ body.modal-open {
 .validation-qr-section {
   position: relative;
   z-index: 1;
-  padding: 18px;
+  padding: 18px 0;
   border-top: 1px solid rgba(229, 231, 235, 0.9);
   background: rgba(249, 250, 251, 0.75);
   backdrop-filter: blur(2px);
@@ -424,11 +424,13 @@ body.modal-open {
 
 .validation-qr-title {
   margin: 0 0 6px;
+  padding: 0 var(--carnet-field-padding-x);
   font-size: clamp(1.0625rem, 0.95rem + 0.65vw, 1.1875rem);
 }
 
 .validation-qr-intro {
   margin: 0 0 14px;
+  padding: 0 var(--carnet-field-padding-x);
   color: var(--muted);
   font-size: var(--carnet-support-size);
 }
@@ -437,12 +439,18 @@ body.modal-open {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .validation-qr-stage {
   position: relative;
-  display: inline-block;
+  display: block;
+  width: 100%;
   line-height: 0;
+}
+
+.validation-qr-code {
+  width: 100%;
 }
 
 .validation-qr-stage.is-expired .validation-qr-code,
@@ -486,22 +494,24 @@ body.modal-open {
 
 .qr-code-image {
   position: relative;
-  display: inline-block;
+  display: block;
+  width: 100%;
   line-height: 0;
+  background: #fff;
 }
 
-.qr-code-image > img.qr-code-matrix {
+.qr-code-image > .qr-code-matrix {
   display: block;
-  width: min(220px, 70vw);
+  width: 100%;
   height: auto;
-  margin: 0 auto;
-  border-radius: 12px;
+  aspect-ratio: 1 / 1;
+  margin: 0;
   background: #fff;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
 }
 
 .validation-qr-validity {
   margin: 12px 0 0;
+  padding: 0 var(--carnet-field-padding-x);
   color: var(--muted);
   font-size: var(--carnet-support-size);
   line-height: 1.45;

@@ -36,8 +36,13 @@ h1 {
   vertical-align: middle;
 }
 
-.request-timing {
+.results-count {
   margin: 12px 0 0;
+  font-size: 1rem;
+}
+
+.request-timing {
+  margin: 8px 0 0;
   font-size: 0.875rem;
   color: #6b7280;
   font-variant-numeric: tabular-nums;
@@ -64,6 +69,51 @@ h1 {
   min-width: 0;
 }
 
+.search-panel {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0;
+  overflow: hidden;
+}
+
+.search-panel-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 12px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.search-panel-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.search-panel-toggle::after {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 2px solid #6b7280;
+  border-bottom: 2px solid #6b7280;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.search-panel[open] > .search-panel-toggle::after {
+  transform: rotate(-135deg);
+  margin-top: 0.25rem;
+}
+
+.search-panel .search-row {
+  padding: 0 14px 14px;
+}
+
 .search-row,
 #results-wrap,
 .table-scroll {
@@ -77,7 +127,12 @@ label {
   font-weight: 600;
 }
 
-input[type="search"] {
+.search-panel-toggle {
+  margin-bottom: 0;
+}
+
+input[type="search"],
+.socio-number-field input {
   width: 100%;
   padding: 10px 12px;
   box-sizing: border-box;
@@ -85,6 +140,50 @@ input[type="search"] {
   min-height: 3rem;
   border: 1px solid #d1d5db;
   border-radius: 8px;
+}
+
+.socio-number-field {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.socio-number-prefix {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0 10px 0 12px;
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  border-right: 1px solid #d1d5db;
+  user-select: none;
+}
+
+.socio-number-field input {
+  border: 0;
+  border-radius: 0;
+  min-width: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.socio-number-field:focus-within {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+}
+
+.field-hint {
+  margin: 6px 0 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 400;
 }
 
 .search-row {
@@ -196,7 +295,8 @@ tbody tr.row-pagado-empty {
     font-size: 1rem;
   }
 
-  input[type="search"] {
+  input[type="search"],
+  .socio-number-field input {
     font-size: 1rem;
     padding: 10px 12px;
     min-height: 2.75rem;

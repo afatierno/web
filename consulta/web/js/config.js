@@ -5,6 +5,10 @@ const SEARCH_SETTINGS = {
   MIN_QUERY_LENGTH: 4,
   MIN_MANUAL_QUERY_LENGTH: 3,
   DEBOUNCE_MS: 300,
+  /** Prefijo fijo del nº de socio en el buscador por número. */
+  SOCIO_NUMBER_PREFIX: "202627",
+  /** Mínimo de dígitos (tras el prefijo) para lanzar la búsqueda automática. */
+  SOCIO_NUMBER_MIN_DIGITS: 3,
 };
 
 const CONFIG_PARAM = "c";
